@@ -3,6 +3,7 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+comedogenic_ingredients.csv
 # C extensions
 *.so
 
