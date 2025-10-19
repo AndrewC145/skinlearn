@@ -11,15 +11,18 @@ from .serializer import IngredientSerializer
 @permission_classes([AllowAny])
 def check_ingredients(request: any):
     if request.method == "POST":
+        if request.user.is_authenticated:
+            avoid_ing = request.user.avoid_ingredients
         serializer = IngredientSerializer(data=request.data)
+
         try:
             if serializer.is_valid():
                 ingredients = serializer.data.get("ingredients", [])
-                user_id = serializer.data.get("user_id", None)
                 comedogenic_results = [
                     ing
                     for ing in ingredients
                     if Ingredients.objects.filter(name=ing.lower()).exists()
+                    or ing in avoid_ing
                 ]
                 return Response(
                     {

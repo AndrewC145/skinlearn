@@ -1,9 +1,13 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import status
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .serializer import UserSerializer, CustomTokenObtainPairSerializer
+from .serializer import (
+    UserSerializer,
+    CustomTokenObtainPairSerializer,
+    AvoidIngredientsSerializer,
+)
 
 
 # Create your views here.
@@ -22,3 +26,28 @@ def register_user(request: any):
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+
+
+@api_view(["PATCH"])
+@permission_classes([IsAuthenticated])
+def upload_avoid_ingredients(request: any):
+    if request.method == "PATCH":
+        try:
+            user = request.user
+            serializer = AvoidIngredientsSerializer(
+                user, data=request.data, partial=True
+            )
+            if serializer.is_valid():
+                serializer.save()
+                return Response(
+                    {"message": "Uploaded ingredients"}, status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {"error": "Invalid Input"}, status=status.HTTP_400_BAD_REQUEST
+                )
+        except:
+            return Response(
+                {"error": "An unexpected error occurred"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )

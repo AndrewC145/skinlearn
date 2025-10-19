@@ -30,3 +30,16 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         }
 
         return data
+
+
+class AvoidIngredientsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["avoid_ingredients"]
+
+    def update(self, instance, validated_data):
+        instance.avoid_ingredients = validated_data.get(
+            "avoid_ingredients", instance.avoid_ingredients
+        )
+        instance.save()
+        return instance
