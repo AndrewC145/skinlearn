@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import ArrayField
+from django.core.validators import MinLengthValidator
 
 
 # Create your models here.
@@ -18,7 +19,12 @@ class User(AbstractUser):
         (SENSITIVE, "Sensitive"),
         (COMBINATION, "Combination"),
     ]
-
+    username = models.CharField(
+        unique=True,
+        max_length=20,
+        validators=[MinLengthValidator(5)],
+        error_messages={"unique": "A user with that username already exists"},
+    )
     skin_type = models.CharField(
         max_length=15, null=False, blank=False, choices=SKIN_TYPE_CHOICES
     )
