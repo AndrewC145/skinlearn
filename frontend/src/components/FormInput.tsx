@@ -5,6 +5,7 @@
   placeholder: string;
   label: string;
   register: any;
+  errors: any;
 };
 
 function FormInput({
@@ -14,19 +15,23 @@ function FormInput({
   placeholder,
   label,
   register,
+  errors,
 }: FormInputType) {
   return (
-    <label htmlFor={id}>
-      {label}
+    <div className="flex flex-col space-y-2">
+      <label className="sr-only" htmlFor={id}>
+        {label}
+      </label>
       <input
-        {...register(name)}
+        {...register(name, { required: true })}
         type={type}
         id={id}
         name={name}
         placeholder={placeholder}
-        required
+        className="rounded-sm border-none bg-[#F2EDE0] p-3 outline-none focus:border-2 focus:border-solid"
       />
-    </label>
+      {errors && <p className="text-sm text-red-500">{errors.message}</p>}
+    </div>
   );
 }
 

@@ -1,10 +1,8 @@
 import Form from "../components/Form";
 import FormInput from "../components/FormInput";
-import * as z from "zod";
 import { loginSchema, type loginFormValues } from "../types/formTypes";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { FormEvent } from "react";
 
 function Login() {
   const {
@@ -23,14 +21,9 @@ function Login() {
   const onSubmit = (data: loginFormValues) => {
     console.log("Login data:", data);
   };
+
   return (
-    <Form
-      onSubmit={(e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        handleSubmit(onSubmit);
-      }}
-      title="Login"
-    >
+    <Form onSubmit={handleSubmit(onSubmit)} title="Login" route="login">
       <FormInput
         id="username"
         name="username"
@@ -38,6 +31,7 @@ function Login() {
         placeholder="Username"
         label="Username"
         register={register}
+        errors={errors.username}
       />
       <FormInput
         id="password"
@@ -46,6 +40,7 @@ function Login() {
         placeholder="Password"
         label="Password"
         register={register}
+        errors={errors.password}
       />
     </Form>
   );

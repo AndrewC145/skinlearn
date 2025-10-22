@@ -1,7 +1,7 @@
 import * as z from "zod";
 export const loginSchema = z.object({
-  username: z.string(),
-  password: z.string(),
+  username: z.string().nonempty({ error: "Username is required" }),
+  password: z.string().nonempty({ error: "Password is required" }),
 });
 
 export const registerSchema = z
