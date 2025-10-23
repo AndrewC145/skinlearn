@@ -14,13 +14,16 @@ export const registerSchema = z
     password: z
       .string()
       .min(8, { error: "Password must be at least 8 characters long" }),
-    confirmPassword: z.string(),
-    skinType: z.enum(["Dry", "Oily", "Sensitive", "Acne", "Combination"]),
+    confirmPassword: z
+      .string()
+      .min(8, { error: "Password must be at least 8 characters long" }),
+    skinType: z.enum(["Dry", "Oily", "Sensitive", "Acne", "Combination"], {
+      error: "Please select a skin type",
+    }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     error: "Passwords do not match",
     path: ["confirmPassword"],
   });
-
 export type loginFormValues = z.infer<typeof loginSchema>;
 export type registerFormValues = z.infer<typeof registerSchema>;

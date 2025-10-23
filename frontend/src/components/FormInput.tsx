@@ -23,14 +23,14 @@ function FormInput({
         {label}
       </label>
       <input
-        {...register(name, { required: true })}
+        {...register(name)}
         type={type}
         id={id}
         name={name}
         placeholder={placeholder}
         className="rounded-sm border-none bg-[#F2EDE0] p-3 outline-none focus:border-2 focus:border-solid"
       />
-      {errors && <p className="text-sm text-red-500">{errors.message}</p>}
+      {errors && <p className="text-sm text-red-500">{errors?.message}</p>}
     </div>
   );
 }

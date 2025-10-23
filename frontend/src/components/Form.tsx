@@ -38,7 +38,7 @@ function Form({
         </div>
         <div className="flex h-full w-1/2 flex-col px-12">
           <div className="space-y-4">
-            <h1 className="mb-0 text-6xl font-semibold">{title}</h1>
+            <h1 className="mb-0 text-5xl font-semibold">{title}</h1>
             <FormSubheader route={route} />
             {children}
           </div>
