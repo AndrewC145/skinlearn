@@ -18,8 +18,15 @@ def register_user(request: any):
         serialized_data = UserSerializer(data=request.data)
         if serialized_data.is_valid():
             serialized_data.save()
+            token_serializer = CustomTokenObtainPairSerializer(
+                data={
+                    "username": request.data.get("username"),
+                    "password": request.data.get("password"),
+                }
+            )
+        if token_serializer.is_valid():
             return Response(
-                {"message": "User created successfully"}, status=status.HTTP_201_CREATED
+                token_serializer.validated_data, status=status.HTTP_201_CREATED
             )
         return Response({serialized_data.errors}, status=status.HTTP_400_BAD_REQUEST)
 

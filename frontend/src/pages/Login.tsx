@@ -3,8 +3,10 @@ import FormInput from "../components/FormInput";
 import { loginSchema, type loginFormValues } from "../types/formTypes";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAuth } from "../context/AuthContext";
 
 function Login() {
+  const { handleLogin } = useAuth();
   const {
     register,
     handleSubmit,
@@ -18,12 +20,8 @@ function Login() {
     },
   });
 
-  const onSubmit = (data: loginFormValues) => {
-    console.log("Login data:", data);
-  };
-
   return (
-    <Form onSubmit={handleSubmit(onSubmit)} title="Login" route="login">
+    <Form onSubmit={handleSubmit(handleLogin)} title="Login" route="login">
       <FormInput
         id="username"
         name="username"

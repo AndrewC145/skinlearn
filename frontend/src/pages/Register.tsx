@@ -3,8 +3,10 @@ import FormInput from "../components/FormInput";
 import { type registerFormValues, registerSchema } from "../types/formTypes";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAuth } from "../context/AuthContext";
 
 function Register() {
+  const { handleSignup } = useAuth();
   const {
     register,
     handleSubmit,
@@ -20,13 +22,9 @@ function Register() {
     },
   });
 
-  const onSubmit = (data: registerFormValues) => {
-    console.log("Register data:", data);
-  };
-
   return (
     <Form
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleSubmit(handleSignup)}
       route="register"
       title="Create an account"
     >
