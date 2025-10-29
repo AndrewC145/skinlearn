@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, type NavigateFunction } from "react-router";
-import { AuthContext } from "./AuthContext";
+import { AuthContext, type User } from "./AuthContext";
 import {
   type loginFormValues,
   type registerFormValues,
@@ -9,7 +9,7 @@ import api from "../api";
 import type { AxiosResponse } from "axios";
 
 function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
 
   const navigate: NavigateFunction = useNavigate();
@@ -22,11 +22,15 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (response.status === 200) {
-        setUser(response.data.user);
-        setToken(response.data.accessToken);
+        setUser({
+          id: response.data.id,
+          username: response.data.username,
+          avoid_ingredients: response.data.avoid_ingredients,
+        });
+        setToken(response.data.token.access);
         navigate("/");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
     }
   };
@@ -47,10 +51,13 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error(error);
     }
   };
+  const handleLogout = async () => {};
 
   return (
-    <AuthContext.Provider
-      value={{ handleLogin, handleSignup, handleLogout }}
-    ></AuthContext.Provider>
+    <AuthContext.Provider value={{ handleLogin, handleSignup, handleLogout }}>
+      {children}
+    </AuthContext.Provider>
   );
 }
+
+export default AuthProvider;

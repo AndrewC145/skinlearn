@@ -8,6 +8,12 @@ from .serializer import (
     CustomTokenObtainPairSerializer,
     AvoidIngredientsSerializer,
 )
+import environ
+import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 
 # Create your views here.
@@ -32,7 +38,21 @@ def register_user(request: any):
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        serializer = CustomTokenObtainPairSerializer(data=request.data)
+        if serializer.is_valid():
+            response = Response(serializer.validated_data, status=status.HTTP_200_OK)
+            response.set_cookie(
+                key="refresh",
+                value=serializer.validated_data["token"]["refresh"],
+                max_age=3600 * 24,
+                httponly=True,
+                secure=env("PY_PRODUCTION"),
+            )
+            return response
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["PATCH"])
