@@ -1,7 +1,21 @@
 import axios from "axios";
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
-});
+export function createApi(token: string | null) {
+  const api = axios.create({
+    baseURL: import.meta.env.VITE_API_URL,
+  });
 
-export default api;
+  api.interceptors.request.use(
+    (config) => {
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+
+      return config;
+    },
+    (error: unknown) => {
+      return Promise.reject(error);
+    },
+  );
+  return api;
+}

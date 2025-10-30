@@ -5,7 +5,7 @@ import {
   type loginFormValues,
   type registerFormValues,
 } from "../types/formTypes";
-import api from "../api";
+import { createApi } from "../api";
 import type { AxiosResponse } from "axios";
 
 function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -14,12 +14,18 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const navigate: NavigateFunction = useNavigate();
 
-  const handleLogin = async (data: loginFormValues) => {
+  const handleLogin: (data: loginFormValues) => Promise<void> = async (
+    data: loginFormValues,
+  ) => {
     try {
-      const response: AxiosResponse = await api.post("api/token/", data, {
-        headers: { "Content-Type": "application/json" },
-        withCredentials: true,
-      });
+      const response: AxiosResponse = await createApi(token).post(
+        "api/token/",
+        data,
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        },
+      );
 
       if (response.status === 200) {
         setUser({
@@ -35,13 +41,19 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const handleSignup = async (data: registerFormValues) => {
+  const handleSignup: (data: registerFormValues) => Promise<void> = async (
+    data: registerFormValues,
+  ) => {
     try {
-      const response: AxiosResponse = await api.post("api/register/", data, {
-        headers: {
-          "Content-Type": "application/json",
+      const response: AxiosResponse = await createApi(token).post(
+        "api/register/",
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
 
       if (response.status === 201) {
         setUser(response.data.user);
@@ -51,9 +63,9 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error(error);
     }
   };
-  const handleLogout = async () => {
+  const handleLogout: () => Promise<void> = async () => {
     try {
-      const response: AxiosResponse = await api.post(
+      const response: AxiosResponse = await createApi(token).post(
         "api/logout",
         {},
         {

@@ -25,5 +25,11 @@ export const registerSchema = z
     error: "Passwords do not match",
     path: ["confirmPassword"],
   });
+
+export const ingredientsSchema = z.object({
+  ingredients: z.string().nonempty({ error: "Ingredients cannot be empty" }),
+});
+
+export type ingredientsValues = z.infer<typeof ingredientsSchema>;
 export type loginFormValues = z.infer<typeof loginSchema>;
 export type registerFormValues = z.infer<typeof registerSchema>;
