@@ -47,14 +47,35 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(response.data.user);
         setToken(response.data.accessToken);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
     }
   };
-  const handleLogout = async () => {};
+  const handleLogout = async () => {
+    try {
+      const response: AxiosResponse = await api.post(
+        "api/logout",
+        {},
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        },
+      );
+
+      if (response.status === 200) {
+        setToken(null);
+        setUser(null);
+        navigate("/");
+      }
+    } catch (error: unknown) {
+      console.error(error);
+    }
+  };
 
   return (
-    <AuthContext.Provider value={{ handleLogin, handleSignup, handleLogout }}>
+    <AuthContext.Provider
+      value={{ handleLogin, handleSignup, handleLogout, user, setUser }}
+    >
       {children}
     </AuthContext.Provider>
   );
