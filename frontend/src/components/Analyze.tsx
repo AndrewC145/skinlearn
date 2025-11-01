@@ -35,16 +35,21 @@ function Analyze() {
     }
   };
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <p>Please separate ingredients by commas</p>
-      <label htmlFor="ingredients">Ingredients</label>
-      <textarea
-        {...register("ingredients")}
-        name="ingredients"
-        id="ingredients"
-      ></textarea>
-      <button type="submit">Submit</button>
-    </form>
+    <section>
+      <div>
+        <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
+          <h1>Pore Clogging Ingredient Checker</h1>
+          <p>Please separate ingredients by commas</p>
+          <label htmlFor="ingredients">Ingredients</label>
+          <textarea
+            {...register("ingredients")}
+            name="ingredients"
+            id="ingredients"
+          ></textarea>
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+    </section>
   );
 }
 

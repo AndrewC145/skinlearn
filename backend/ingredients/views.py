@@ -25,8 +25,6 @@ def check_ingredients(request: any):
                 ]
 
                 comedogenic_ingredients = Ingredients.objects.filter(name__in=parsed)
-
-                print(comedogenic_ingredients)
                 return Response(
                     {
                         "message": "handled ingredients",
