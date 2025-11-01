@@ -2,6 +2,4 @@ from rest_framework import serializers
 
 
 class IngredientSerializer(serializers.Serializer):
-    ingredients = serializers.ListField(
-        child=serializers.CharField(), allow_empty=False
-    )
+    ingredients = serializers.CharField(allow_blank=False)

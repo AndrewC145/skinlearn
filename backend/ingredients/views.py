@@ -4,30 +4,35 @@ from rest_framework import status
 from rest_framework.response import Response
 from .models import Ingredients
 from .serializer import IngredientSerializer
+import re
 
 
 # Create your views here.
 @api_view(["POST"])
-@permission_classes([AllowAny])
+@permission_classes([])
 def check_ingredients(request: any):
     if request.method == "POST":
         if request.user.is_authenticated:
             avoid_ing = request.user.avoid_ingredients
         serializer = IngredientSerializer(data=request.data)
-
         try:
             if serializer.is_valid():
-                ingredients = serializer.data.get("ingredients", [])
-                comedogenic_results = [
-                    ing
-                    for ing in ingredients
-                    if Ingredients.objects.filter(name=ing.lower()).exists()
-                    or ing in avoid_ing
+                ingredients = serializer.validated_data.get("ingredients", "")
+
+                parsed = [
+                    s.strip().lower()
+                    for s in re.split(r",(?!\s?\d+(?:,\d+)*-\w)", ingredients)
                 ]
+
+                comedogenic_ingredients = Ingredients.objects.filter(name__in=parsed)
+
+                print(comedogenic_ingredients)
                 return Response(
                     {
                         "message": "handled ingredients",
-                        "comedogenic_ingredients": comedogenic_results,
+                        "comedogenic_ingredients": list(
+                            comedogenic_ingredients.values()
+                        ),
                     },
                     status=status.HTTP_200_OK,
                 )
@@ -41,3 +46,8 @@ def check_ingredients(request: any):
                 {"message": "An unexpected error occurred"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+    else:
+        return Response(
+            {"message": "Invalid HTTP method"},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED,
+        )

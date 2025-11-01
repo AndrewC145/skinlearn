@@ -86,7 +86,15 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ handleLogin, handleSignup, handleLogout, user, setUser }}
+      value={{
+        handleLogin,
+        handleSignup,
+        handleLogout,
+        user,
+        setUser,
+        token,
+        setToken,
+      }}
     >
       {children}
     </AuthContext.Provider>

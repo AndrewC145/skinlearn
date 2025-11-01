@@ -16,6 +16,8 @@ export type AuthContextType = {
   handleLogout: () => Promise<void>;
   setUser: React.Dispatch<SetStateAction<User | null>>;
   user: User | null;
+  token: string | null;
+  setToken: React.Dispatch<SetStateAction<string | null>>;
 };
 
 export const AuthContext = createContext<AuthContextType>({
@@ -24,6 +26,8 @@ export const AuthContext = createContext<AuthContextType>({
   handleLogout: async () => {},
   setUser: () => {},
   user: null,
+  token: null,
+  setToken: () => {},
 });
 
 export const useAuth = () => {
