@@ -5,6 +5,7 @@
 
 @theme {
   --font-figtree: "Figtree", "sans-serif";
+  --font-noto-jp: "Noto Serif Japanese", "sans-serif";
 }
 
 @theme inline {

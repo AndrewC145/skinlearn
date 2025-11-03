@@ -1,7 +1,13 @@
 import Analyze from "../components/Analyze";
+import Hero from "../components/Hero";
 
 function Home() {
-  return <Analyze />;
+  return (
+    <>
+      <Hero />
+      <Analyze />
+    </>
+  );
 }
 
 export default Home;
