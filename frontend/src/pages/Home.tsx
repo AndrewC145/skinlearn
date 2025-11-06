@@ -1,11 +1,11 @@
-import Analyze from "../components/Analyze";
+import Features from "../components/Features";
 import Hero from "../components/Hero";
 
 function Home() {
   return (
     <>
       <Hero />
-      <Analyze />
+      <Features />
     </>
   );
 }

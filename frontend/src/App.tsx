@@ -4,6 +4,7 @@ import Register from "./pages/Register";
 import Home from "./pages/Home";
 import AuthProvider from "./context/AuthProvider";
 import Header from "./components/Header";
+import Footer from "./components/Footer";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
             <Route path="/register" element={<Register />} />
           </Routes>
         </main>
+        <Footer />
       </AuthProvider>
     </BrowserRouter>
   );
