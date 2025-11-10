@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { ingredientsSchema, type ingredientsValues } from "../types/formTypes";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -6,10 +7,12 @@ import { useAuth } from "../context/AuthContext";
 import { Textarea } from "../components/ui/textarea";
 import { Button } from "../components/ui/button";
 import { Label } from "../components/ui/label";
+import Modal from "./Modal";
 import type { MouseEventHandler } from "react";
 
 function Analyze() {
   const { token } = useAuth();
+  const [personalIngredients, setPersonalIngredients] = useState<string[]>([]);
   const {
     register,
     handleSubmit,
@@ -23,8 +26,6 @@ function Analyze() {
   });
 
   const onSubmit = async (data: ingredientsValues) => {
-    // const parsed = data.ingredients.split(/,(?!\d+-)/).map((s) => s.trim());
-
     try {
       const response = await createApi(token).post(
         "ingredients/analyze/",
@@ -79,10 +80,9 @@ function Analyze() {
               text="Clear"
               onClick={() => reset({ ingredients: "" })}
             />
-            <TemplateButton
-              type="button"
-              className="bg-blue-600 hover:bg-blue-700"
-              text="Add Your Own Ingredients"
+            <Modal
+              personalIngredients={personalIngredients}
+              setPersonalIngredients={setPersonalIngredients}
             />
           </div>
         </form>
@@ -91,7 +91,7 @@ function Analyze() {
   );
 }
 
-function TemplateButton({
+export function TemplateButton({
   text,
   className,
   onClick,
@@ -99,7 +99,7 @@ function TemplateButton({
 }: {
   text: string;
   className?: string;
-  type: string;
+  type: "reset" | "button" | "submit" | undefined;
   onClick?: MouseEventHandler;
 }) {
   return (
