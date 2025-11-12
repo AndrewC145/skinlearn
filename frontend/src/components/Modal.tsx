@@ -13,7 +13,7 @@ import { Label } from "./ui/label";
 import { Button } from "./ui/button";
 import { X, SendHorizontal } from "lucide-react";
 import type { MouseEventHandler, SetStateAction } from "react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 type ModalProps = {
   personalIngredients: string[];
@@ -22,8 +22,20 @@ type ModalProps = {
 
 function Modal({ personalIngredients, setPersonalIngredients }: ModalProps) {
   const [ingredientValue, setIngredientValue] = useState<string>("");
+  const [submitted, setIsSubmitted] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
+
+  const originalIngredients = useRef<string[]>([]);
+
+  const onSubmit = () => {
+    setIsSubmitted(false);
+    setOpen(false);
+  };
+
   const addIngredient = (ingredient: string) => {
-    setPersonalIngredients((prev) => [...prev, ingredient]);
+    if (!personalIngredients.includes(ingredient)) {
+      setPersonalIngredients((prev) => [...prev, ingredient]);
+    }
     setIngredientValue("");
   };
 
@@ -35,8 +47,20 @@ function Modal({ personalIngredients, setPersonalIngredients }: ModalProps) {
     setPersonalIngredients((prev) => prev.filter((ing) => ing !== ingredient));
   };
 
+  const handleOpenChange = (isOpen: boolean) => {
+    if (isOpen) {
+      originalIngredients.current = [...personalIngredients];
+    } else {
+      if (!submitted) {
+        setPersonalIngredients(originalIngredients.current);
+      }
+      setIsSubmitted(false);
+    }
+    setOpen(isOpen);
+  };
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button
           type="button"
@@ -100,7 +124,7 @@ function Modal({ personalIngredients, setPersonalIngredients }: ModalProps) {
               Cancel
             </Button>
           </DialogClose>
-          <Button className="cursor-pointer" type="submit">
+          <Button onClick={onSubmit} className="cursor-pointer" type="submit">
             Save Changes
           </Button>
         </DialogFooter>
