@@ -9,11 +9,13 @@ function Form({
   children,
   onSubmit,
   route,
+  customErr,
 }: {
   title: string;
   children: React.ReactNode;
   onSubmit: SubmitHandler<any>;
   route: string;
+  customErr: string | undefined;
 }) {
   const btnName = route === "login" ? "Log in" : "Register";
   return (
@@ -37,13 +39,18 @@ function Form({
           />
         </div>
         <div className="flex h-full w-1/2 flex-col px-12">
-          <div className="space-y-4">
+          <div className="mb-12 space-y-4">
             <h1 className="mb-0 text-5xl font-semibold">{title}</h1>
             <FormSubheader route={route} />
             {children}
           </div>
+          {customErr && (
+            <div className="mb-4">
+              <p className="text-sm text-red-500">{customErr}</p>
+            </div>
+          )}
           <button
-            className="mt-12 cursor-pointer rounded-sm bg-[#000000] px-2 py-3 text-white hover:bg-gray-900"
+            className="cursor-pointer rounded-sm bg-[#000000] px-2 py-3 text-white hover:bg-gray-900"
             type="submit"
           >
             {btnName}

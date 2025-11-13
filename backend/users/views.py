@@ -4,7 +4,7 @@ from rest_framework.decorators import (
     authentication_classes,
 )
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -30,6 +30,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 def register_user(request: any):
     if request.method == "POST":
         serialized_data = UserSerializer(data=request.data)
+        token_serializer = None
         if serialized_data.is_valid():
             serialized_data.save()
             token_serializer = CustomTokenObtainPairSerializer(
@@ -38,11 +39,11 @@ def register_user(request: any):
                     "password": request.data.get("password"),
                 }
             )
-        if token_serializer.is_valid():
+        if token_serializer is not None and token_serializer.is_valid():
             return Response(
                 token_serializer.validated_data, status=status.HTTP_201_CREATED
             )
-        return Response({serialized_data.errors}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serialized_data.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
         return Response(
             {"error": "Invalid request method."},

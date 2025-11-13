@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { useNavigate, type NavigateFunction } from "react-router";
 import { AuthContext, type User } from "./AuthContext";
@@ -36,8 +37,8 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
         setToken(response.data.token.access);
         navigate("/");
       }
-    } catch (error: unknown) {
-      console.error(error);
+    } catch (error: any) {
+      throw new Error(error.response.data.detail);
     }
   };
 
@@ -59,8 +60,8 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(response.data.user);
         setToken(response.data.accessToken);
       }
-    } catch (error: unknown) {
-      console.error(error);
+    } catch (error: any) {
+      throw new Error(error.response.data.detail);
     }
   };
   const handleLogout: () => Promise<void> = async () => {
@@ -79,8 +80,8 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(null);
         navigate("/");
       }
-    } catch (error: unknown) {
-      console.error(error);
+    } catch (error: any) {
+      throw new Error(error.response.data.detail);
     }
   };
 

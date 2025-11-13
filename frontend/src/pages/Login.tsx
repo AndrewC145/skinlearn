@@ -1,17 +1,19 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Form from "../components/Form";
 import FormInput from "../components/FormInput";
 import { loginSchema, type loginFormValues } from "../types/formTypes";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "../context/AuthContext";
+import { useState } from "react";
 
 function Login() {
+  const [customErr, setCustomErr] = useState<string | undefined>("");
   const { handleLogin } = useAuth();
   const {
     register,
     handleSubmit,
     formState: { errors },
-    setError,
   } = useForm<loginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -20,8 +22,22 @@ function Login() {
     },
   });
 
+  const onSubmit = async (data: loginFormValues) => {
+    try {
+      await handleLogin(data);
+      setCustomErr("");
+    } catch (err: any) {
+      setCustomErr(err.message);
+    }
+  };
+
   return (
-    <Form onSubmit={handleSubmit(handleLogin)} title="Login" route="login">
+    <Form
+      customErr={customErr}
+      onSubmit={handleSubmit(onSubmit)}
+      title="Login"
+      route="login"
+    >
       <FormInput
         id="username"
         name="username"

@@ -1,17 +1,19 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Form from "../components/Form";
 import FormInput from "../components/FormInput";
 import { type registerFormValues, registerSchema } from "../types/formTypes";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "../context/AuthContext";
+import { useState } from "react";
 
 function Register() {
   const { handleSignup } = useAuth();
+  const [customErr, setCustomErr] = useState<string | undefined>("");
   const {
     register,
     handleSubmit,
     formState: { errors },
-    setError,
   } = useForm<registerFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -22,9 +24,19 @@ function Register() {
     },
   });
 
+  const onSubmit = async (data: registerFormValues) => {
+    try {
+      await handleSignup(data);
+      setCustomErr("");
+    } catch (err: any) {
+      setCustomErr(err.message);
+    }
+  };
+
   return (
     <Form
-      onSubmit={handleSubmit(handleSignup)}
+      customErr={customErr}
+      onSubmit={handleSubmit(onSubmit)}
       route="register"
       title="Create an account"
     >
@@ -64,19 +76,20 @@ function Register() {
         register={register}
         errors={errors.confirmPassword}
       />
-      <label htmlFor="skinType" className="sr-only">
+      <label htmlFor="skin_type" className="sr-only">
         Skin Type
       </label>
-      <select {...register("skinType")} name="skinType" id="skinType">
+      <select {...register("skin_type")} name="skinType" id="skinType">
         <option value="">Choose a Skin Type</option>
         <option value="Dry">Dry</option>
+        <option value="Normal">Normal</option>
         <option value="Combination">Combination</option>
         <option value="Oily">Oily</option>
         <option value="Sensitive">Sensitive</option>
         <option value="Acne">Acne</option>
       </select>
-      {errors.skinType && (
-        <p className="text-sm text-red-500">{errors.skinType?.message}</p>
+      {errors.skin_type && (
+        <p className="text-sm text-red-500">{errors.skin_type?.message}</p>
       )}
     </Form>
   );

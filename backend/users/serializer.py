@@ -1,13 +1,28 @@
 from rest_framework import serializers
 from .models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.contrib.auth.password_validation import validate_password
 
 
 class UserSerializer(serializers.ModelSerializer):
+    confirmPassword = serializers.CharField(min_length=8)
+
     class Meta:
         model = User
-        fields = ["username", "email", "password", "skin_type"]
-        extra_kwargs = {"password": {"write_only": True}}
+        fields = ["username", "email", "password", "confirmPassword", "skin_type"]
+        extra_kwargs = {
+            "password": {"write_only": True},
+            "confirmPassword": {"write_only": True},
+        }
+
+    def validate(self, attrs):
+        if attrs["password"] != attrs["confirmPassword"]:
+            raise serializers.ValidationError(["Passwords do not match"])
+        return attrs
+
+    def validate_password(self, password):
+        validate_password(password)
+        return password
 
     def create(self, validated_data):
         user = User(

@@ -17,9 +17,12 @@ export const registerSchema = z
     confirmPassword: z
       .string()
       .min(8, { error: "Password must be at least 8 characters long" }),
-    skinType: z.enum(["Dry", "Oily", "Sensitive", "Acne", "Combination"], {
-      error: "Please select a skin type",
-    }),
+    skin_type: z.enum(
+      ["Dry", "Normal", "Oily", "Sensitive", "Acne", "Combination"],
+      {
+        error: "Please select a skin type",
+      },
+    ),
   })
   .refine((data) => data.password === data.confirmPassword, {
     error: "Passwords do not match",
