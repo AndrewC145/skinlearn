@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from .models import Ingredients
 from .serializer import IngredientSerializer
 import re
+import logging
 
 
 # Create your views here.
@@ -12,9 +13,15 @@ import re
 @permission_classes([])
 def check_ingredients(request: any):
     if request.method == "POST":
+        avoid_ing = None
         if request.user.is_authenticated:
             avoid_ing = request.user.avoid_ingredients
-        serializer = IngredientSerializer(data=request.data)
+        else:
+            avoid_ing = request.data.get("personalIngredients", [])
+        ingredients_data = request.data.get("data", {})
+        serializer = IngredientSerializer(
+            data={"ingredients": ingredients_data.get("ingredients", "")}
+        )
         try:
             if serializer.is_valid():
                 ingredients = serializer.validated_data.get("ingredients", "")
@@ -24,24 +31,32 @@ def check_ingredients(request: any):
                     for s in re.split(r",(?!\s?\d+(?:,\d+)*-\w)", ingredients)
                 ]
 
-                comedogenic_ingredients = Ingredients.objects.filter(name__in=parsed)
+                pore_clog_set = Ingredients.objects.filter(name__in=parsed).values_list(
+                    "name", flat=True
+                )
+                personal_avoids = [ing for ing in avoid_ing if ing.lower() in parsed]
+
+                comedogenic_ingredients = list(pore_clog_set)
+                comedogenic_ingredients.extend(personal_avoids)
+
                 return Response(
                     {
                         "message": "handled ingredients",
-                        "comedogenic_ingredients": list(
-                            comedogenic_ingredients.values()
-                        ),
+                        "comedogenic_ingredients": comedogenic_ingredients,
                     },
                     status=status.HTTP_200_OK,
                 )
             else:
+                logging.error(f"Ingredient error: ", serializer.errors)
                 return Response(
-                    {"message": "Invalid input"}, status=status.HTTP_400_BAD_REQUEST
+                    {"message": "Invalid input", "errors": serializer.errors},
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
 
-        except:
+        except Exception as e:
+            logging.exception("Error in check_ingredients")
             return Response(
-                {"message": "An unexpected error occurred"},
+                {"message": "An unexpected error occurred", "error": str(e)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
     else:

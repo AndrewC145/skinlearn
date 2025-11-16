@@ -8,11 +8,15 @@ import { Textarea } from "../components/ui/textarea";
 import { Button } from "../components/ui/button";
 import { Label } from "../components/ui/label";
 import Modal from "./Modal";
+import ComedogenicList from "./ComedogenicList";
 import type { MouseEventHandler } from "react";
 
 function Analyze() {
   const { token } = useAuth();
   const [personalIngredients, setPersonalIngredients] = useState<string[]>([]);
+  const [comedogenicIngredients, setComedogenicIngredients] = useState<
+    string[]
+  >([]);
   const {
     register,
     handleSubmit,
@@ -29,29 +33,38 @@ function Analyze() {
     try {
       const response = await createApi(token).post(
         "ingredients/analyze/",
-        data,
+        { data, personalIngredients },
         {
           headers: { "Content-Type": "application/json" },
           withCredentials: true,
         },
       );
-      console.log(response);
+
+      if (response.status === 200) {
+        setComedogenicIngredients(response.data.comedogenic_ingredients);
+      }
     } catch (error: unknown) {
       console.error(error);
+      setComedogenicIngredients([]);
     }
   };
+
+  const onReset = () => {
+    setComedogenicIngredients([]);
+    reset({ ingredients: "" });
+  };
   return (
-    <section className="font-figtree flex h-[80vh] items-center justify-center">
-      <div className="flex w-full items-center justify-center">
+    <section className="font-figtree flex items-center justify-center">
+      <div className="flex h-screen w-full flex-col items-center justify-center">
         <form
           className="mx-auto flex w-1/2 flex-col items-center justify-center space-y-4"
           onSubmit={handleSubmit(onSubmit)}
         >
           <div className="w-full space-y-4">
-            <h1 className="text-center text-6xl font-semibold">
+            <h1 className="text-center text-2xl font-semibold sm:text-3xl md:text-4xl lg:text-5xl xl:text-[56px]">
               Pore Clogging Checker
             </h1>
-            <p className="text-center">
+            <p className="text-center text-base">
               Checking for pore-clogging ingredients in your skincare before you
               buy have never been easier. In fact, you can even check if the
               product contains any ingredients you know that you react to.
@@ -69,7 +82,7 @@ function Analyze() {
               {...register("ingredients")}
               name="ingredients"
               id="ingredients"
-              className="placeholder:text-base"
+              className="max-w-full overflow-y-auto placeholder:text-base xl:max-h-56 2xl:max-h-64"
             ></Textarea>
           </div>
           <div className="mt-5 flex w-full items-center justify-center space-x-6">
@@ -78,7 +91,7 @@ function Analyze() {
               type="reset"
               className="bg-gray-600 hover:bg-gray-700"
               text="Clear"
-              onClick={() => reset({ ingredients: "" })}
+              onClick={onReset}
             />
             <Modal
               personalIngredients={personalIngredients}
@@ -86,6 +99,9 @@ function Analyze() {
             />
           </div>
         </form>
+        {comedogenicIngredients.length > 0 ? (
+          <ComedogenicList comedogenicIngredients={comedogenicIngredients} />
+        ) : null}
       </div>
     </section>
   );
