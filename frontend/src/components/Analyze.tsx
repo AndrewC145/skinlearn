@@ -9,6 +9,7 @@ import { Button } from "../components/ui/button";
 import { Label } from "../components/ui/label";
 import Modal from "./Modal";
 import ComedogenicList from "./ComedogenicList";
+import Error from "./Error";
 import type { MouseEventHandler } from "react";
 
 function Analyze() {
@@ -84,6 +85,7 @@ function Analyze() {
               id="ingredients"
               className="max-w-full overflow-y-auto placeholder:text-base xl:max-h-56 2xl:max-h-64"
             ></Textarea>
+            {errors && <Error err={errors.ingredients} />}
           </div>
           <div className="mt-5 flex w-full items-center justify-center space-x-6">
             <TemplateButton type="submit" text="Check" />

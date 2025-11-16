@@ -1,4 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */ type FormInputType = {
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import Error from "./Error";
+
+type FormInputType = {
   id: string;
   name: string;
   type: string;
@@ -30,7 +34,7 @@ function FormInput({
         placeholder={placeholder}
         className="rounded-sm border-none bg-[#F2EDE0] p-3 outline-none focus:border-2 focus:border-solid"
       />
-      {errors && <p className="text-sm text-red-500">{errors?.message}</p>}
+      {errors && <Error err={errors} />}
     </div>
   );
 }
