@@ -1,4 +1,5 @@
 import Analyze from "../components/Analyze";
+import CommonIngredients from "../components/CommonIngredients";
 import { useEffect } from "react";
 
 function Checker() {
@@ -9,6 +10,7 @@ function Checker() {
   return (
     <>
       <Analyze />
+      <CommonIngredients />
     </>
   );
 }

@@ -1,4 +1,3 @@
-from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 from rest_framework.response import Response
@@ -57,6 +56,37 @@ def check_ingredients(request: any):
             logging.exception("Error in check_ingredients")
             return Response(
                 {"message": "An unexpected error occurred", "error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+    else:
+        return Response(
+            {"message": "Invalid HTTP method"},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED,
+        )
+
+
+@api_view(["GET"])
+@permission_classes([])
+def get_all_ingredients(request: any):
+    if request.method == "GET":
+        try:
+            all_ings = (
+                Ingredients.objects.filter(category__isnull=True)
+                .order_by("name")
+                .values_list("name", flat=True)
+            )
+
+            return Response(
+                {
+                    "message": "Fetched ingredients successfully",
+                    "ingredients": all_ings,
+                },
+                status=status.HTTP_200_OK,
+            )
+        except Exception as e:
+            logging.exception("Fetching ingredients error")
+            return Response(
+                {"message": "An error occurred fetching ingredients", "error": str(e)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
     else:

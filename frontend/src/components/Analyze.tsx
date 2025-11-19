@@ -55,7 +55,7 @@ function Analyze() {
     reset({ ingredients: "" });
   };
   return (
-    <section className="font-figtree flex items-center justify-center">
+    <section className="flex items-center justify-center">
       <div className="flex h-screen w-full flex-col items-center justify-center">
         <form
           className="mx-auto flex w-1/2 flex-col items-center justify-center space-y-4"
