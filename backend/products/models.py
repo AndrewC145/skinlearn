@@ -5,9 +5,27 @@ from users.models import User
 
 # Create your models here.
 class Products(models.Model):
+    CLEANSER = "Cleanser"
+    TONER = "Toner"
+    SERUM = "Serum"
+    MOISTURIZER = "Moisturizer"
+    SUNSCREEN = "Sunscreen"
+    OTHER = "Other"
+
+    PRODUCT_CHOICES = [
+        (CLEANSER, "Cleanser"),
+        (TONER, "Toner"),
+        (SERUM, "Serum"),
+        (MOISTURIZER, "Moisturizer"),
+        (SUNSCREEN, "Sunscreen"),
+        (OTHER, "Other"),
+    ]
+
     name = models.CharField(max_length=255)
     brand = models.CharField(max_length=255, null=True, blank=True)
-    category = models.CharField(max_length=50, null=False, blank=False)
+    category = models.CharField(
+        max_length=50, null=False, blank=False, choices=PRODUCT_CHOICES
+    )
     ingredients = models.ManyToManyField(Ingredients)
     user_added = models.BooleanField(default=False)
     is_approved = models.BooleanField(default=False)
