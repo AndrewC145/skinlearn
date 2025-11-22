@@ -25,10 +25,10 @@ function Form({
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
-      className="mx-auto flex h-screen items-center justify-center"
+      className="mx-auto flex items-center justify-center"
     >
       <form
-        className="font-figtree flex max-w-5xl items-center justify-center rounded-lg bg-white text-black"
+        className="font-figtree my-8 flex h-[90vh] max-w-5xl items-center justify-center rounded-lg bg-white text-black"
         onSubmit={onSubmit}
       >
         <div className="h-full w-1/2 p-4">
@@ -38,9 +38,9 @@ function Form({
             alt="Face Cream"
           />
         </div>
-        <div className="flex h-full w-1/2 flex-col px-12">
+        <div className="flex h-full w-1/2 flex-col justify-center px-12 py-8">
           <div className="mb-12 space-y-4">
-            <h1 className="mb-0 text-5xl font-semibold">{title}</h1>
+            <h1 className="mb-0 text-4xl font-semibold text-nowrap">{title}</h1>
             <FormSubheader route={route} />
             {children}
           </div>

@@ -32,7 +32,7 @@ function FormInput({
         id={id}
         name={name}
         placeholder={placeholder}
-        className="rounded-sm border-none bg-[#F2EDE0] p-3 outline-none focus:border-2 focus:border-solid"
+        className="rounded-sm border-none bg-[#F2EDE0] p-2.5 outline-none placeholder:text-base focus:border-2 focus:border-solid"
       />
       {errors && <Error err={errors} />}
     </div>
