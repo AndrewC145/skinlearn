@@ -6,6 +6,7 @@ import AuthProvider from "./context/AuthProvider";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Checker from "./pages/Checker";
+import Builder from "./pages/Builder";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/pore-clogging-checker" element={<Checker />} />
+            <Route path="/routine-builder" element={<Builder />} />
           </Routes>
         </main>
         <Footer />

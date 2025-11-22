@@ -30,8 +30,10 @@ def check_ingredients(request: any):
                     for s in re.split(r",(?!\s?\d+(?:,\d+)*-\w)", ingredients)
                 ]
 
-                pore_clog_set = Ingredients.objects.filter(name__in=parsed).values_list(
-                    "name", flat=True
+                pore_clog_set = (
+                    Ingredients.objects.filter(name__in=parsed)
+                    .filter(category="comedogenic")
+                    .values_list("name", flat=True)
                 )
                 personal_avoids = [ing for ing in avoid_ing if ing.lower() in parsed]
 
@@ -71,8 +73,9 @@ def get_all_ingredients(request: any):
     if request.method == "GET":
         try:
             all_ings = (
-                Ingredients.objects.filter(category__isnull=True)
+                Ingredients.objects.filter(category="comedogenic")
                 .order_by("name")
+                .distinct()
                 .values_list("name", flat=True)
             )
 
