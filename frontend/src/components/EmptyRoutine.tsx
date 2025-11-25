@@ -5,21 +5,26 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "../components/ui/empty";
-import { PackageSearch } from "lucide-react";
 
-function EmptyRoutine() {
+function EmptyRoutine({
+  icon,
+  title,
+  description,
+  children,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  children?: React.ReactNode;
+}) {
   return (
     <Empty>
       <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <PackageSearch />
-        </EmptyMedia>
-        <EmptyTitle>No Products Yet</EmptyTitle>
-        <EmptyDescription>
-          You haven&apos;t added any projects yet for this routine. Get started
-          by adding your first product.
-        </EmptyDescription>
+        <EmptyMedia variant="icon">{icon}</EmptyMedia>
+        <EmptyTitle>{title}</EmptyTitle>
+        <EmptyDescription>{description}</EmptyDescription>
       </EmptyHeader>
+      {children}
     </Empty>
   );
 }

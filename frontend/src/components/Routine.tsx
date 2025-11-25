@@ -1,9 +1,8 @@
-import { CirclePlus } from "lucide-react";
 import { useState, useEffect } from "react";
 import Product from "./Product";
-import { Button } from "../components/ui/button";
 import EmptyRoutine from "./EmptyRoutine";
-
+import SearchModal from "./SearchModal";
+import { PackageSearch } from "lucide-react";
 type ProductTypes = {
   productName: string;
   tag: string;
@@ -19,12 +18,18 @@ function Routine({ day, icon }: { day: string; icon: React.ReactNode }) {
           {icon}
           <span>Routine</span>
         </div>
-        <Button variant="outline" className="cursor-pointer" size="sm">
-          <CirclePlus />
-          Add new product
-        </Button>
+        <SearchModal />
       </div>
-      <div className="mt-4">{!products ? <EmptyRoutine /> : null}</div>
+      <div className="mt-4">
+        {!products ? (
+          <EmptyRoutine
+            icon={<PackageSearch />}
+            title="No Products Yet"
+            description="You haven't added any projects yet for this routine. Get started
+          by adding your first product."
+          />
+        ) : null}
+      </div>
     </div>
   );
 }
