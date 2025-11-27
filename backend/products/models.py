@@ -1,6 +1,7 @@
 from django.db import models
 from ingredients.models import Ingredients
 from users.models import User
+from cloudinary.models import CloudinaryField
 
 
 # Create your models here.
@@ -33,3 +34,4 @@ class Products(models.Model):
         User, null=True, blank=False, on_delete=models.SET_NULL
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    image = CloudinaryField("image", null=True, blank=True)

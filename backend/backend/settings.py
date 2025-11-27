@@ -14,6 +14,10 @@ from pathlib import Path
 from datetime import timedelta
 import environ
 import os
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+import cloudinary_storage
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -64,6 +68,7 @@ INSTALLED_APPS = [
     "ingredients",
     "users",
     "products",
+    "cloudinary",
 ]
 
 MIDDLEWARE = [
@@ -141,6 +146,24 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
+
+# Cloudinary - Django integration
+cloudinary.config(
+    cloud_name=env("CLOUD_NAME"),
+    api_key=env("CLOUDINARY_API_KEY"),
+    api_secret=env("API_SECRET"),
+)
+
+
+# Storages for Images
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
