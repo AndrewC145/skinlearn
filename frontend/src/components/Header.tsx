@@ -54,7 +54,7 @@ function HeaderDropDown() {
   const { user, handleLogout } = useAuth();
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>
         <Button
           className="cursor-pointer border-none bg-transparent shadow-none hover:bg-transparent"
           variant="outline"

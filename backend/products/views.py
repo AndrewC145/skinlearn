@@ -26,7 +26,10 @@ def submit_product(request: any):
 
             if serialized_data.is_valid():
                 serialized_data.save(created_by=request.user)
-                return Response(serialized_data.data, status=status.HTTP_201_CREATED)
+                return Response(
+                    {"message": "Product submitted successfully!"},
+                    status=status.HTTP_201_CREATED,
+                )
 
             return Response(serialized_data.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:

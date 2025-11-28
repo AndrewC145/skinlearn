@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { productSchema, type productFormValues } from "../types/formTypes";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,6 +15,7 @@ import { useAuth } from "../context/AuthContext";
 function SubmitPage() {
   const { token } = useAuth();
   const [customErr, setCustomErr] = useState<string | undefined>("");
+  const [success, setSuccess] = useState<string | undefined>("");
 
   const {
     register,
@@ -40,9 +42,12 @@ function SubmitPage() {
         },
       );
 
-      console.log(response);
-    } catch (error: unknown) {
+      if (response.status === 201) {
+        setSuccess(response.data.message);
+      }
+    } catch (error: any) {
       console.error(error);
+      setCustomErr(error.response.data);
     }
   };
 
@@ -80,16 +85,26 @@ function SubmitPage() {
               label="Brand"
               type="text"
             />
-            <Label htmlFor="ingredients" className="sr-only">
-              Ingredients
-            </Label>
-            <Textarea
-              id="ingredients"
-              {...register("ingredients")}
-              className="rounded-sm border-none bg-[#F2EDE0] p-2.5 outline-none placeholder:text-base focus:border-2 focus:border-solid"
-              rows={8}
-              placeholder="Ingredients"
-            />
+
+            <div className="space-y-2">
+              <Label htmlFor="ingredients" className="sr-only">
+                Ingredients
+              </Label>
+              <Textarea
+                id="ingredients"
+                {...register("ingredients")}
+                className="max-w-full rounded-sm border-none bg-[#F2EDE0] p-2.5 outline-none placeholder:text-base focus:border-2 focus:border-solid xl:max-h-56 2xl:max-h-64"
+                rows={8}
+                placeholder="Ingredients"
+              />
+              {errors.ingredients && (
+                <p className="text-sm text-red-500">
+                  {errors.ingredients.message}
+                </p>
+              )}
+            </div>
+            {success && <p className="text-sm text-green-500">{success}</p>}
+            {customErr && <p className="text-sm text-red-500">{customErr}</p>}
             <Button type="submit" className="w-full cursor-pointer">
               Submit
             </Button>
