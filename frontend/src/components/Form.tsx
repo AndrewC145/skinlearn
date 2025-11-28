@@ -14,7 +14,7 @@ function Form({
   title: string;
   children: React.ReactNode;
   onSubmit: SubmitHandler<any>;
-  route: string;
+  route?: string;
   customErr: string | undefined;
 }) {
   const btnName = route === "login" ? "Log in" : "Register";
@@ -61,7 +61,7 @@ function Form({
   );
 }
 
-function FormSubheader({ route }: { route: string }) {
+function FormSubheader({ route }: { route?: string }) {
   const name =
     route === "login" ? "Don't have an account?" : "Already have an account?";
   const redirectName = route === "login" ? "Register" : "Log in";

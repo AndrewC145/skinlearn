@@ -18,6 +18,9 @@ function Footer() {
             <li>
               <Link to="/routine-builder">Routine Builder</Link>
             </li>
+            <li>
+              <Link to="/submit-product">Submit a Product</Link>
+            </li>
           </ul>
         </div>
         <div className="mr-8 flex justify-end">

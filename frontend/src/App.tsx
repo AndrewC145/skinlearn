@@ -7,6 +7,8 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Checker from "./pages/Checker";
 import Builder from "./pages/Builder";
+import SubmitPage from "./pages/SubmitPage";
+import Protected from "./components/Protected";
 
 function App() {
   return (
@@ -20,6 +22,14 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/pore-clogging-checker" element={<Checker />} />
             <Route path="/routine-builder" element={<Builder />} />
+            <Route
+              path="/submit-product"
+              element={
+                <Protected>
+                  <SubmitPage />
+                </Protected>
+              }
+            />
           </Routes>
         </main>
         <Footer />

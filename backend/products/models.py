@@ -23,7 +23,7 @@ class Products(models.Model):
     ]
 
     name = models.CharField(max_length=255)
-    brand = models.CharField(max_length=255, null=True, blank=True)
+    brand = models.CharField(max_length=255, null=True, blank=False)
     category = models.CharField(
         max_length=50, null=False, blank=False, choices=PRODUCT_CHOICES
     )
@@ -35,3 +35,12 @@ class Products(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     image = CloudinaryField("image", null=True, blank=True)
+
+
+class ProductSubmission(models.Model):
+    name = models.CharField(max_length=255)
+    brand = models.CharField(max_length=255, null=True, blank=False)
+    ingredients = models.ManyToManyField(Ingredients)
+    created_by = models.ForeignKey(
+        User, null=True, blank=False, on_delete=models.SET_NULL
+    )
