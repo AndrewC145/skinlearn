@@ -2,6 +2,7 @@ from django.db import models
 from ingredients.models import Ingredients
 from users.models import User
 from cloudinary.models import CloudinaryField
+from django.contrib.postgres.fields import ArrayField
 
 
 # Create your models here.
@@ -41,6 +42,9 @@ class ProductSubmission(models.Model):
     name = models.CharField(max_length=255)
     brand = models.CharField(max_length=255, null=True, blank=False)
     ingredients = models.ManyToManyField(Ingredients)
+    raw_ingredients = ArrayField(
+        models.CharField(max_length=255), default=list, null=False
+    )
     created_by = models.ForeignKey(
         User, null=True, blank=False, on_delete=models.SET_NULL
     )

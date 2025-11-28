@@ -27,9 +27,12 @@ def validate_name(value):
 
 
 def validate_ingredients(value):
-    if len(value) <= 3:
-        raise serializers.ValidationError("There must be more than 3 ingredients")
-    return value
+    cleaned = [v.strip().lower() for v in value if v.strip()]
+
+    if len(cleaned) < 3:
+        raise serializers.ValidationError("At least 3 ingredients are required")
+
+    return cleaned
 
 
 def validate_category(value):
@@ -90,7 +93,14 @@ class ProductSubmissionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductSubmission
-        fields = ["name", "brand", "ingredients", "ingredient_names", "created_by"]
+        fields = [
+            "name",
+            "brand",
+            "ingredients",
+            "ingredient_names",
+            "raw_ingredients",
+            "created_by",
+        ]
         extra_kwargs = {"created_by": {"read_only": True}}
 
     def validate_name(self, value):
@@ -106,9 +116,6 @@ class ProductSubmissionSerializer(serializers.ModelSerializer):
     def validate_ingredients(self, value):
         return validate_ingredients(value)
 
-    def validate_category(self, value):
-        return validate_category(value)
-
     def create(self, validated_data):
         ingredient_names = validated_data.pop("ingredients")
         submission = ProductSubmission.objects.create(**validated_data)
@@ -118,12 +125,15 @@ class ProductSubmissionSerializer(serializers.ModelSerializer):
             normalized = raw.strip().lower()
 
             try:
-                ingredient = Ingredients.objects.get(name__iexact=normalized)
-                objs.append(ingredient)
+                ingredient = Ingredients.objects.filter(name__iexact=normalized).first()
+                if ingredient:
+                    objs.append(ingredient)
             except Ingredients.DoesNotExist:
                 pass
 
         submission.ingredients.set(objs)
+        submission.raw_ingredients = ingredient_names
+        submission.save()
         return submission
 
     def get_ingredient_names(self, obj):
