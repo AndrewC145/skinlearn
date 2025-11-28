@@ -8,8 +8,11 @@ import { Button } from "../components/ui/button";
 import productImg from "../assets/images/product-bg.jpg";
 import FormInput from "../components/FormInput";
 import { createApi } from "../api";
+import type { AxiosResponse } from "axios";
+import { useAuth } from "../context/AuthContext";
 
 function SubmitPage() {
+  const { token } = useAuth();
   const [customErr, setCustomErr] = useState<string | undefined>("");
 
   const {
@@ -26,7 +29,21 @@ function SubmitPage() {
   });
 
   const onSubmit = async (data: productFormValues) => {
-    console.log(data);
+    try {
+      const response: AxiosResponse = await createApi(token).post(
+        "ingredients/submit/",
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      console.log(response);
+    } catch (error: unknown) {
+      console.error(error);
+    }
   };
 
   return (
@@ -73,7 +90,7 @@ function SubmitPage() {
               rows={8}
               placeholder="Ingredients"
             />
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full cursor-pointer">
               Submit
             </Button>
           </div>

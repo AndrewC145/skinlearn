@@ -9,6 +9,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import status
 from .serializer import ProductSubmissionSerializer
 from .models import Products, ProductSubmission
+import re
 
 
 # Create your views here.
@@ -18,10 +19,15 @@ from .models import Products, ProductSubmission
 def submit_product(request: any):
     if request.method == "POST":
         try:
+            request.data["ingredients"] = [
+                s.strip().lower() for s in re.split(r",|/", request.data["ingredients"])
+            ]
             serialized_data = ProductSubmissionSerializer(data=request.data)
+
             if serialized_data.is_valid():
-                serialized_data.save()
-                return Response(serialized_data, status=status.HTTP_201_CREATED)
+                serialized_data.save(created_by=request.user)
+                return Response(serialized_data.data, status=status.HTTP_201_CREATED)
+
             return Response(serialized_data.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response(

@@ -8,16 +8,22 @@ def validate_name(value):
     if len(value) <= 4:
         raise serializers.ValidationError("Product name is too short")
 
-    similar = (
-        Ingredients.objects.annotate(similarity=TrigramSimilarity("name", value))
+    dup1 = (
+        ProductSubmission.objects.annotate(similarity=TrigramSimilarity("name", value))
         .filter(similarity__gt=0.7)
         .order_by("-similarity")
     )
 
-    if similar.exists():
+    dup2 = (
+        Products.objects.annotate(similarity=TrigramSimilarity("name", value))
+        .filter(similarity__gt=0.7)
+        .order_by("-similarity")
+    )
+
+    if dup1.exists() or dup2.exists():
         raise serializers.ValidationError("There already exists a similar item")
 
-    return value
+    return value.lower()
 
 
 def validate_ingredients(value):
@@ -33,8 +39,8 @@ def validate_category(value):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    ingredients = serializers.SlugRelatedField(
-        slug_field="name", queryset=Ingredients.objects.all(), many=True
+    ingredients = serializers.ListField(
+        child=serializers.CharField(), allow_empty=False
     )
 
     class Meta:
@@ -57,37 +63,68 @@ class ProductSerializer(serializers.ModelSerializer):
             "image": {"read_only": True},
         }
 
-        def validate_name(self, value):
-            return validate_name(self, value)
+    def validate_name(self, value):
+        return validate_name(value)
 
-        def validate_ingredients(self, value):
-            return validate_ingredients(self, value)
+    def validate_ingredients(self, value):
+        return validate_ingredients(value)
 
-        def validate_category(self, value):
-            return validate_category(self, value)
+    def validate_category(self, value):
+        return validate_category(value)
 
-        def create(self, validated_data):
-            return Products.objects.create(**validated_data)
+    def create(self, validated_data):
+        ingredient_names = validated_data.pop("ingredients")
+        product = Products.objects.create(**validated_data)
+        ingredient_objs = []
+        for name in ingredient_names:
+            ingredient, _ = Ingredients.objects.get_or_create(name=name)
+            ingredient_objs.append(ingredient)
+        product.ingredients.set(ingredient_objs)
+        return product
 
 
 class ProductSubmissionSerializer(serializers.ModelSerializer):
-    ingredients = serializers.SlugRelatedField(
-        slug_field="name", queryset=Ingredients.objects.all(), many=True
-    )
+    ingredients = serializers.ListField(child=serializers.CharField(), write_only=True)
+
+    ingredient_names = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = ProductSubmission
-        fields = ["name", "brand", "ingredients", "created_by"]
+        fields = ["name", "brand", "ingredients", "ingredient_names", "created_by"]
         extra_kwargs = {"created_by": {"read_only": True}}
 
-        def validate_name(self, value):
-            return validate_name(self, value)
+    def validate_name(self, value):
+        return validate_name(value)
 
-        def validate_ingredients(self, value):
-            return validate_ingredients(self, value)
+    def validate_brand(self, value):
+        if len(value) > 50:
+            raise serializers.ValidationError(
+                "Brand name must be less than 50 characters"
+            )
+        return value
 
-        def validate_category(self, value):
-            return validate_category(self, value)
+    def validate_ingredients(self, value):
+        return validate_ingredients(value)
 
-        def create(self, validated_data):
-            return ProductSubmission.objects.create(**validated_data)
+    def validate_category(self, value):
+        return validate_category(value)
+
+    def create(self, validated_data):
+        ingredient_names = validated_data.pop("ingredients")
+        submission = ProductSubmission.objects.create(**validated_data)
+
+        objs = []
+        for raw in ingredient_names:
+            normalized = raw.strip().lower()
+
+            try:
+                ingredient = Ingredients.objects.get(name__iexact=normalized)
+                objs.append(ingredient)
+            except Ingredients.DoesNotExist:
+                pass
+
+        submission.ingredients.set(objs)
+        return submission
+
+    def get_ingredient_names(self, obj):
+        return [i.name for i in obj.ingredients.all()]
