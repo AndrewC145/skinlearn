@@ -2,6 +2,7 @@ from rest_framework.decorators import (
     api_view,
     permission_classes,
     authentication_classes,
+    throttle_classes,
 )
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -16,6 +17,7 @@ from .serializer import (
     CustomTokenObtainPairSerializer,
     AvoidIngredientsSerializer,
 )
+from rest_framework.throttling import AnonRateThrottle
 import environ
 import os
 
@@ -25,8 +27,13 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 
 # Create your views here.
+class RegisterThrottle(AnonRateThrottle):
+    rate = "10/hour"
+
+
 @api_view(["POST"])
 @permission_classes([])
+@throttle_classes([RegisterThrottle])
 def register_user(request: any):
     if request.method == "POST":
         serialized_data = UserSerializer(data=request.data)

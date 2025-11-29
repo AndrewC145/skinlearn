@@ -2,6 +2,7 @@ from rest_framework.decorators import (
     api_view,
     permission_classes,
     authentication_classes,
+    throttle_classes,
 )
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -9,13 +10,19 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import status
 from .serializer import ProductSubmissionSerializer
 from .models import Products, ProductSubmission
+from rest_framework.throttling import UserRateThrottle
 import re
 
 
 # Create your views here.
+class SubmitProductThrottle(UserRateThrottle):
+    rate = "5/hour"
+
+
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 @authentication_classes([JWTAuthentication])
+@throttle_classes([SubmitProductThrottle])
 def submit_product(request: any):
     if request.method == "POST":
         try:
@@ -31,7 +38,9 @@ def submit_product(request: any):
                     status=status.HTTP_201_CREATED,
                 )
 
-            return Response(serialized_data.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": serialized_data.errors}, status=status.HTTP_400_BAD_REQUEST
+            )
         except Exception as e:
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR

@@ -7,15 +7,19 @@ import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
 import { Button } from "../components/ui/button";
 import productImg from "../assets/images/product-bg.jpg";
-import FormInput from "../components/FormInput";
 import { createApi } from "../api";
 import type { AxiosResponse } from "axios";
 import { useAuth } from "../context/AuthContext";
+import { SubmitInput, SubmitError } from "../components/SubmitInput";
 
 function SubmitPage() {
   const { token } = useAuth();
-  const [customErr, setCustomErr] = useState<string | undefined>("");
+  const [fieldErrors, setFieldErrors] = useState<Record<
+    string,
+    string[]
+  > | null>(null);
   const [success, setSuccess] = useState<string | undefined>("");
+  const [customErr, setCustomErr] = useState<string | null>(null);
 
   const {
     register,
@@ -44,10 +48,21 @@ function SubmitPage() {
 
       if (response.status === 201) {
         setSuccess(response.data.message);
+        setFieldErrors(null);
+        setCustomErr(null);
       }
     } catch (error: any) {
       console.error(error);
-      setCustomErr(error.response.data);
+      if (
+        error.response?.data?.error &&
+        typeof error.response.data.error === "object"
+      ) {
+        setFieldErrors(error.response.data.error);
+      }
+
+      if (error.status === 429) {
+        setCustomErr(error.response?.data?.detail);
+      }
     }
   };
 
@@ -63,11 +78,10 @@ function SubmitPage() {
         <form
           className="w-1/3 rounded-md border-1 bg-white p-8 shadow-md"
           onSubmit={handleSubmit(onSubmit)}
-          action=""
         >
           <div className="space-y-6 rounded-md">
             <h1 className="text-2xl font-semibold">Submit a Product</h1>
-            <FormInput
+            <SubmitInput
               id="name"
               name="name"
               placeholder="Product Name"
@@ -75,8 +89,10 @@ function SubmitPage() {
               errors={errors.name}
               label="Product Name"
               type="text"
+              fieldErrors={fieldErrors?.name}
             />
-            <FormInput
+
+            <SubmitInput
               id="brand"
               name="brand"
               placeholder="Brand"
@@ -84,6 +100,7 @@ function SubmitPage() {
               errors={errors.brand}
               label="Brand"
               type="text"
+              fieldErrors={fieldErrors?.brand}
             />
 
             <div className="space-y-2">
@@ -97,14 +114,13 @@ function SubmitPage() {
                 rows={8}
                 placeholder="Ingredients"
               />
-              {errors.ingredients && (
-                <p className="text-sm text-red-500">
-                  {errors.ingredients.message}
-                </p>
+              {errors.ingredients && <InlineError err={errors.ingredients} />}
+              {fieldErrors?.ingredients && (
+                <SubmitError err={fieldErrors.ingredients} />
               )}
+              {customErr && <InlineError err={customErr} />}
             </div>
             {success && <p className="text-sm text-green-500">{success}</p>}
-            {customErr && <p className="text-sm text-red-500">{customErr}</p>}
             <Button type="submit" className="w-full cursor-pointer">
               Submit
             </Button>
@@ -113,6 +129,10 @@ function SubmitPage() {
       </div>
     </section>
   );
+}
+
+function InlineError({ err }: { err: any }) {
+  return <p className="text-sm text-red-500">{err}</p>;
 }
 
 export default SubmitPage;
