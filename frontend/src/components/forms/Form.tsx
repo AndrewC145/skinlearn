@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { type SubmitHandler } from "react-hook-form";
-import formImg from "../assets/images/form.jpg";
-import bg from "../assets/images/form-bg.jpg";
+import formImg from "../../assets/images/form.jpg";
+import bg from "../../assets/images/form-bg.jpg";
 import { Link } from "react-router";
 
 function Form({
