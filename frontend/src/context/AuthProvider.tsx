@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
+import { useState, useLayoutEffect } from "react";
 import { useNavigate, type NavigateFunction } from "react-router";
 import { AuthContext, type User } from "./AuthContext";
 import {
@@ -7,7 +7,15 @@ import {
   type registerFormValues,
 } from "../types/formTypes";
 import { createApi } from "../api";
-import type { AxiosResponse } from "axios";
+import axios, {
+  type AxiosResponse,
+  type InternalAxiosRequestConfig,
+} from "axios";
+
+interface InternalAxiosRequestConfigWithRetry
+  extends InternalAxiosRequestConfig {
+  _retry?: boolean;
+}
 
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -85,6 +93,39 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new Error(error.response.data.detail);
     }
   };
+
+  useLayoutEffect(() => {
+    const authInterceptor = axios.interceptors.request.use(
+      (config: InternalAxiosRequestConfigWithRetry) => {
+        config.headers.Authorization =
+          token && !config._retry
+            ? `Bearer ${token}`
+            : config.headers.Authorization;
+
+        return config;
+      },
+    );
+
+    return () => {
+      axios.interceptors.request.eject(authInterceptor);
+    };
+  }, [token]);
+
+  useLayoutEffect(() => {
+    const authResponseInterceptor = axios.interceptors.response.use(function onFulfilled(response) {
+      return response;
+    },
+    async function onRejected(error) {
+      const originalrequest: InternalAxiosRequestConfigWithRetry = error.config;
+
+      if (error.response?.status === 403) {
+        try {
+          const response: AxiosResponse = await axios.get()
+        }
+      }
+    }
+  )
+  })
 
   return (
     <AuthContext.Provider
