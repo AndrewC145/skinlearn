@@ -42,6 +42,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             "id": self.user.id,
             "username": self.user.username,
             "avoid_ingredients": self.user.avoid_ingredients,
+            "superuser": self.user.is_superuser,
         }
 
         return data

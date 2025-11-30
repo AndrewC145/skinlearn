@@ -33,6 +33,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
           id: response.data.id,
           username: response.data.username,
           avoid_ingredients: response.data.avoid_ingredients,
+          superuser: response.data.superuser,
         });
         setToken(response.data.token.access);
         navigate("/");
