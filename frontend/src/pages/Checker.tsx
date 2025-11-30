@@ -1,6 +1,6 @@
-import Analyze from "../components/Analyze";
-import CommonIngredients from "../components/CommonIngredients";
-import Faq from "../components/FAQ";
+import Analyze from "../components/ingredient-checker/Analyze";
+import CommonIngredients from "../components/ingredient-checker/CommonIngredients";
+import Faq from "../components/ingredient-checker/Faq";
 import { useEffect } from "react";
 
 function Checker() {

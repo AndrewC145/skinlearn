@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Product from "./Product";
 import EmptyRoutine from "./EmptyRoutine";
-import SearchModal from "./SearchModal";
+import SearchModal from "./forms/SearchModal";
 import { PackageSearch } from "lucide-react";
 type ProductTypes = {
   productName: string;

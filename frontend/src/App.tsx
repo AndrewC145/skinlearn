@@ -9,6 +9,7 @@ import Checker from "./pages/Checker";
 import Builder from "./pages/Builder";
 import SubmitPage from "./pages/SubmitPage";
 import Protected from "./components/Protected";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   return (
@@ -27,6 +28,14 @@ function App() {
               element={
                 <Protected>
                   <SubmitPage />
+                </Protected>
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                <Protected>
+                  <Dashboard />
                 </Protected>
               }
             />

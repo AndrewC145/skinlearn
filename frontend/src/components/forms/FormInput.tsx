@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import Error from "./Error";
+import Error from "../Error";
 
 type FormInputType = {
   id: string;

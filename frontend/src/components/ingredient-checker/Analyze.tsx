@@ -1,15 +1,18 @@
 import { useState } from "react";
-import { ingredientsSchema, type ingredientsValues } from "../types/formTypes";
+import {
+  ingredientsSchema,
+  type ingredientsValues,
+} from "../../types/formTypes";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createApi } from "../api";
-import { useAuth } from "../context/AuthContext";
-import { Textarea } from "../components/ui/textarea";
-import { Button } from "../components/ui/button";
-import { Label } from "../components/ui/label";
+import { createApi } from "../../api";
+import { useAuth } from "../../context/AuthContext";
+import { Textarea } from "../../components/ui/textarea";
+import { Button } from "../../components/ui/button";
+import { Label } from "../../components/ui/label";
 import Modal from "./Modal";
 import ComedogenicList from "./ComedogenicList";
-import Error from "./Error";
+import Error from "../Error";
 import type { MouseEventHandler } from "react";
 
 function Analyze() {

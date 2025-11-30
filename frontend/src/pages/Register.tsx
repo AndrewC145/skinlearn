@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import Form from "../components/Form";
-import FormInput from "../components/FormInput";
+import Form from "../components/forms/Form";
+import FormInput from "../components/forms/FormInput";
 import { type registerFormValues, registerSchema } from "../types/formTypes";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
