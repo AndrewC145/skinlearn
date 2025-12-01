@@ -6,7 +6,6 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createApi } from "../../api";
-import { useAuth } from "../../context/AuthContext";
 import { Textarea } from "../../components/ui/textarea";
 import { Button } from "../../components/ui/button";
 import { Label } from "../../components/ui/label";
@@ -16,7 +15,6 @@ import Error from "../Error";
 import type { MouseEventHandler } from "react";
 
 function Analyze() {
-  const { token } = useAuth();
   const [personalIngredients, setPersonalIngredients] = useState<string[]>([]);
   const [comedogenicIngredients, setComedogenicIngredients] = useState<
     string[]
@@ -35,7 +33,7 @@ function Analyze() {
 
   const onSubmit = async (data: ingredientsValues) => {
     try {
-      const response = await createApi(token).post(
+      const response = await createApi().post(
         "ingredients/analyze/",
         { data, personalIngredients },
         {

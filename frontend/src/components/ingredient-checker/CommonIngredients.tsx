@@ -1,15 +1,13 @@
 import { useState, useEffect } from "react";
 import { createApi } from "../../api";
-import { useAuth } from "../../context/AuthContext";
 
 function CommonIngredients() {
-  const { token } = useAuth();
   const [ingredients, setIngredients] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchIngredients = async () => {
       try {
-        const response = await createApi(token).get("ingredients/", {});
+        const response = await createApi().get("ingredients/", {});
 
         console.log(response);
 
@@ -21,7 +19,7 @@ function CommonIngredients() {
     };
 
     fetchIngredients();
-  }, [token]);
+  }, []);
   return (
     <section className="flex items-center justify-center">
       <div className="my-10 w-3/4 space-y-4">
