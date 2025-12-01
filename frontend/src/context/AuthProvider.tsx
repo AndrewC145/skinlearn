@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useLayoutEffect } from "react";
+import { useState } from "react";
 import { useNavigate, type NavigateFunction } from "react-router";
 import { AuthContext, type User } from "./AuthContext";
 import {
@@ -7,15 +7,7 @@ import {
   type registerFormValues,
 } from "../types/formTypes";
 import { createApi } from "../api";
-import axios, {
-  type AxiosResponse,
-  type InternalAxiosRequestConfig,
-} from "axios";
-
-interface InternalAxiosRequestConfigWithRetry
-  extends InternalAxiosRequestConfig {
-  _retry?: boolean;
-}
+import { type AxiosResponse } from "axios";
 
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -27,7 +19,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     data: loginFormValues,
   ) => {
     try {
-      const response: AxiosResponse = await createApi().post(
+      const response: AxiosResponse = await createApi(token).post(
         "api/token/",
         data,
         {
@@ -55,7 +47,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     data: registerFormValues,
   ) => {
     try {
-      const response: AxiosResponse = await createApi().post(
+      const response: AxiosResponse = await createApi(token).post(
         "api/register/",
         data,
         {
@@ -75,7 +67,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   };
   const handleLogout: () => Promise<void> = async () => {
     try {
-      const response: AxiosResponse = await createApi().post(
+      const response: AxiosResponse = await createApi(token).post(
         "api/logout",
         {},
         {
@@ -93,63 +85,6 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new Error(error.response.data.detail);
     }
   };
-
-  useLayoutEffect(() => {
-    const authInterceptor = axios.interceptors.request.use(
-      (config: InternalAxiosRequestConfigWithRetry) => {
-        config.headers.Authorization =
-          token && !config._retry
-            ? `Bearer ${token}`
-            : config.headers.Authorization;
-
-        return config;
-      },
-    );
-
-    return () => {
-      axios.interceptors.request.eject(authInterceptor);
-    };
-  }, [token]);
-
-  useLayoutEffect(() => {
-    const authResponseInterceptor = axios.interceptors.response.use(
-      function onFulfilled(response) {
-        return response;
-      },
-      async function onRejected(error) {
-        const originalRequest: InternalAxiosRequestConfigWithRetry =
-          error.config;
-
-        if (error.response?.status === 400) {
-          try {
-            const response: AxiosResponse = await createApi().post(
-              "api/refresh",
-              {},
-              {
-                headers: { "Content-Type": "application/json" },
-                withCredentials: true,
-              },
-            );
-
-            if (response.status === 200) {
-              setToken(response.data.accessToken);
-              originalRequest._retry = true;
-              return axios(originalRequest);
-            }
-          } catch (error: any) {
-            console.error("Token refresh failed: ", error);
-            setToken(null);
-          }
-        }
-
-        return Promise.reject(error);
-      },
-    );
-
-    return () => {
-      axios.interceptors.response.eject(authResponseInterceptor);
-    };
-  });
 
   return (
     <AuthContext.Provider

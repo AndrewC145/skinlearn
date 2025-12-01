@@ -9,8 +9,8 @@ import { Button } from "../components/ui/button";
 import productImg from "../assets/images/product-bg.jpg";
 import { createApi } from "../api";
 import type { AxiosResponse } from "axios";
-import { useAuth } from "../context/AuthContext";
 import { SubmitInput, SubmitError } from "../components/forms/SubmitInput";
+import { useAuth } from "../context/AuthContext";
 
 function SubmitPage() {
   const { token } = useAuth();

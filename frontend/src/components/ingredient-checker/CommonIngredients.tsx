@@ -7,7 +7,7 @@ function CommonIngredients() {
   useEffect(() => {
     const fetchIngredients = async () => {
       try {
-        const response = await createApi().get("ingredients/", {});
+        const response = await createApi(null).get("ingredients/", {});
 
         console.log(response);
 

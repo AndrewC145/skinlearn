@@ -13,8 +13,10 @@ import Modal from "./Modal";
 import ComedogenicList from "./ComedogenicList";
 import Error from "../Error";
 import type { MouseEventHandler } from "react";
+import { useAuth } from "../../context/AuthContext";
 
 function Analyze() {
+  const { token } = useAuth();
   const [personalIngredients, setPersonalIngredients] = useState<string[]>([]);
   const [comedogenicIngredients, setComedogenicIngredients] = useState<
     string[]
@@ -33,7 +35,7 @@ function Analyze() {
 
   const onSubmit = async (data: ingredientsValues) => {
     try {
-      const response = await createApi().post(
+      const response = await createApi(token).post(
         "ingredients/analyze/",
         { data, personalIngredients },
         {

@@ -52,6 +52,7 @@ function Header() {
 
 function HeaderDropDown() {
   const { user, handleLogout } = useAuth();
+  console.log(user);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
