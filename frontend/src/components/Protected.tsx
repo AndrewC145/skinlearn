@@ -16,7 +16,7 @@ function Protected({
     return <RequireLogin />;
   }
 
-  if (superuserOnly && !user.superuser) {
+  if (superuserOnly && !user.is_superuser) {
     return <NoSuperuserAccess />;
   }
 
@@ -44,7 +44,7 @@ function RequireLogin() {
 function NoSuperuserAccess() {
   return (
     <section className="flex h-screen items-center justify-center">
-      <div className="flex flex-col items-center justify-center space-y-4">
+      <div className="flex flex-col items-center justify-center space-y-8">
         <h1 className="text-4xl font-bold">
           You do not have permission to access this page.
         </h1>

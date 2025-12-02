@@ -13,10 +13,12 @@ from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .models import User
 from .serializer import (
+    RegisterSerializer,
     UserSerializer,
     CustomTokenObtainPairSerializer,
     AvoidIngredientsSerializer,
 )
+from django.contrib.auth import get_user_model
 from rest_framework.throttling import AnonRateThrottle
 import environ
 import os
@@ -36,7 +38,7 @@ class RegisterThrottle(AnonRateThrottle):
 @throttle_classes([RegisterThrottle])
 def register_user(request: any):
     if request.method == "POST":
-        serialized_data = UserSerializer(data=request.data)
+        serialized_data = RegisterSerializer(data=request.data)
         token_serializer = None
         if serialized_data.is_valid():
             serialized_data.save()
@@ -87,7 +89,14 @@ class CustomTokenRefreshView(TokenRefreshView):
         try:
             token = RefreshToken(refresh_token)
             access_token = str(token.access_token)
-            return Response({"access": access_token}, status=status.HTTP_200_OK)
+            user_id = token.payload.get("user_id")
+            User = get_user_model()
+            user = User.objects.get(id=user_id)
+            user_info = UserSerializer(user).data
+
+            return Response(
+                {"access": access_token, "user": user_info}, status=status.HTTP_200_OK
+            )
         except TokenError as e:
             return Response({"error": str(e)}, status=status.HTTP_401_UNAUTHORIZED)
 

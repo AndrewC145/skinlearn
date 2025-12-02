@@ -4,7 +4,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth.password_validation import validate_password
 
 
-class UserSerializer(serializers.ModelSerializer):
+class RegisterSerializer(serializers.ModelSerializer):
     confirmPassword = serializers.CharField(min_length=8)
 
     class Meta:
@@ -35,6 +35,12 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "username", "avoid_ingredients", "is_superuser"]
+
+
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = {
@@ -42,7 +48,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             "id": self.user.id,
             "username": self.user.username,
             "avoid_ingredients": self.user.avoid_ingredients,
-            "superuser": self.user.is_superuser,
+            "is_superuser": self.user.is_superuser,
         }
 
         return data

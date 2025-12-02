@@ -8,7 +8,7 @@ export type User = {
   id: number;
   username: string;
   avoid_ingredients: string[];
-  superuser: boolean;
+  is_superuser: boolean;
 };
 
 export type AuthContextType = {

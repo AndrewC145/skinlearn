@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, type NavigateFunction } from "react-router";
 import { AuthContext, type User } from "./AuthContext";
 import {
@@ -33,7 +33,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
           id: response.data.id,
           username: response.data.username,
           avoid_ingredients: response.data.avoid_ingredients,
-          superuser: response.data.superuser,
+          is_superuser: response.data.superuser,
         });
         setToken(response.data.token.access);
         navigate("/");
@@ -68,7 +68,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   const handleLogout: () => Promise<void> = async () => {
     try {
       const response: AxiosResponse = await createApi(token).post(
-        "api/logout",
+        "api/logout/",
         {},
         {
           headers: { "Content-Type": "application/json" },
@@ -85,6 +85,32 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new Error(error.response.data.detail);
     }
   };
+
+  useEffect(() => {
+    const rehydrateToken = async () => {
+      try {
+        const response = await createApi(null).post(
+          "api/refresh/",
+          {},
+          {
+            headers: { "Content-Type": "application/json" },
+            withCredentials: true,
+          },
+        );
+
+        if (response.status === 200) {
+          setToken(response.data.access);
+          setUser(response.data.user);
+        }
+      } catch (error: any) {
+        console.error("Refresh token failed", error);
+        setToken(null);
+        setUser(null);
+      }
+    };
+
+    rehydrateToken();
+  }, []);
 
   return (
     <AuthContext.Provider
