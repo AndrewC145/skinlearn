@@ -91,9 +91,12 @@ class ProductSubmissionSerializer(serializers.ModelSerializer):
 
     ingredient_names = serializers.SerializerMethodField(read_only=True)
 
+    created_by = serializers.CharField(source="created_by.username", read_only=True)
+
     class Meta:
         model = ProductSubmission
         fields = [
+            "id",
             "name",
             "brand",
             "ingredients",

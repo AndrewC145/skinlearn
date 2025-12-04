@@ -1,7 +1,6 @@
 import { Button } from "../../components/ui/button";
 import {
   Card,
-  CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
@@ -13,24 +12,32 @@ export const title = "Standard Card";
 function SubmittedProducts({
   title,
   brand,
+  username,
   ingredients,
+  onClick,
 }: {
   title: string;
   brand: string;
-  ingredients: string;
+  username: string;
+  ingredients: string[];
+  onClick: () => Promise<void>;
 }) {
   return (
     <Card className="w-[350px]">
       <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>Brand {brand}</CardDescription>
+        <CardTitle className="capitalize">{title}</CardTitle>
+        <CardDescription>
+          Brand: {brand} <br /> Submitted by: {username}
+        </CardDescription>
       </CardHeader>
-      <CardContent>
-        <span>Ingredients</span>
-        <p>{ingredients}</p>
-      </CardContent>
+      <div className="flex-grow"></div>
       <CardFooter className="flex justify-between">
-        <Button variant="outline">Cancel</Button>
+        <Button onClick={onClick} variant="outline" className="cursor-pointer">
+          Delete
+        </Button>
+        <Button variant="default" className="cursor-pointer">
+          View
+        </Button>
       </CardFooter>
     </Card>
   );

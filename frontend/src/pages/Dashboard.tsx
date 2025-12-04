@@ -5,9 +5,36 @@ import { useState, useEffect } from "react";
 import { createApi } from "../api";
 import type { AxiosResponse } from "axios";
 
+type ProductSubmission = {
+  id: number;
+  name: string;
+  brand: string;
+  created_by: string;
+  raw_ingredients: string[];
+};
+
 function Dashboard() {
   const { token } = useAuth();
   const [submitted, setSubmitted] = useState<any[] | null>(null);
+
+  const deleteProduct = async (id: number) => {
+    try {
+      const response: AxiosResponse = await createApi(token).delete(
+        "ingredients/dashboard",
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+          data: {
+            id,
+          },
+        },
+      );
+
+      console.log(response);
+    } catch (error: any) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -34,9 +61,25 @@ function Dashboard() {
     fetchProducts();
   }, [token]);
   return (
-    <section>
-      <h1>Submitted Products</h1>
-      <div></div>
+    <section className="h-screen">
+      <div className="mt-20 flex flex-col items-center gap-8">
+        <h1 className="inline-block text-4xl font-semibold">
+          Submitted Products
+        </h1>
+        <div className="grid grid-cols-2 gap-4 xl:grid-cols-3 2xl:grid-cols-4">
+          {submitted &&
+            submitted?.map((prod: ProductSubmission) => (
+              <SubmittedProducts
+                key={prod.id}
+                title={prod.name}
+                brand={prod.brand}
+                username={prod.created_by}
+                ingredients={prod.raw_ingredients}
+                onClick={() => deleteProduct(prod.id)}
+              />
+            ))}
+        </div>
+      </div>
     </section>
   );
 }
