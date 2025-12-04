@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useState, useEffect } from "react";
 import { createApi } from "../api";
 import type { AxiosResponse } from "axios";
+import DashboardAlert from "../components/dashboard/DashboardAlert";
 
 type ProductSubmission = {
   id: number;
@@ -81,6 +82,13 @@ function Dashboard() {
               />
             ))}
         </div>
+        {!submitted ? (
+          <div>
+            <h2 className="inline-block text-2xl">
+              No products sent at this time.
+            </h2>
+          </div>
+        ) : null}
       </div>
     </section>
   );
