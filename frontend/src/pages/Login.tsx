@@ -6,9 +6,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
+import { useNavigate, type NavigateFunction } from "react-router";
 
 function Login() {
   const [customErr, setCustomErr] = useState<string | undefined>("");
+  const [success, setSuccess] = useState<string | undefined>("");
   const { handleLogin } = useAuth();
   const {
     register,
@@ -22,12 +24,19 @@ function Login() {
     },
   });
 
+  const navigate: NavigateFunction = useNavigate();
+
   const onSubmit = async (data: loginFormValues) => {
     try {
       await handleLogin(data);
       setCustomErr("");
+      setSuccess("Login successful! Redirecting...");
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
     } catch (err: any) {
       setCustomErr(err.message);
+      setSuccess("");
     }
   };
 
@@ -56,6 +65,7 @@ function Login() {
         register={register}
         errors={errors.password}
       />
+      {success && <span className="text-sm text-green-500">{success}</span>}
     </Form>
   );
 }

@@ -36,7 +36,6 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
           is_superuser: response.data.superuser,
         });
         setToken(response.data.token.access);
-        navigate("/");
       }
     } catch (error: any) {
       throw new Error(error.response.data.detail);
