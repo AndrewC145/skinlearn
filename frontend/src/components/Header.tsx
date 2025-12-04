@@ -67,6 +67,11 @@ function HeaderDropDown() {
           <>
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuGroup>
+              {user.is_superuser ? (
+                <Link to="/dashboard">
+                  <MenuItemHelper text="Dashboard" />
+                </Link>
+              ) : null}
               <MenuItemHelper text="Log out" onClick={handleLogout} />
             </DropdownMenuGroup>
           </>
