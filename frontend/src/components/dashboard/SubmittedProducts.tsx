@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../../components/ui/card";
+import DeleteAlert from "./DeleteAlert";
 
 export const title = "Standard Card";
 
@@ -23,7 +24,7 @@ function SubmittedProducts({
   onClick: () => Promise<void>;
 }) {
   return (
-    <Card className="w-[350px]">
+    <Card className="font-figtree w-[350px]">
       <CardHeader>
         <CardTitle className="capitalize">{title}</CardTitle>
         <CardDescription>
@@ -32,9 +33,14 @@ function SubmittedProducts({
       </CardHeader>
       <div className="flex-grow"></div>
       <CardFooter className="flex justify-between">
-        <Button onClick={onClick} variant="outline" className="cursor-pointer">
-          Delete
-        </Button>
+        <DeleteAlert
+          children={
+            <Button variant="outline" className="cursor-pointer">
+              Delete
+            </Button>
+          }
+          onClick={onClick}
+        />
         <Button variant="default" className="cursor-pointer">
           View
         </Button>
