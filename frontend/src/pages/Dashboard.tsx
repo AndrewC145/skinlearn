@@ -15,22 +15,24 @@ type ProductSubmission = {
 
 function Dashboard() {
   const { token } = useAuth();
-  const [submitted, setSubmitted] = useState<any[] | null>(null);
+  const [submitted, setSubmitted] = useState<any[] | null | undefined>(null);
 
   const deleteProduct = async (id: number) => {
     try {
       const response: AxiosResponse = await createApi(token).delete(
-        "ingredients/dashboard",
+        `ingredients/dashboard/delete/${id}/`,
         {
           headers: { "Content-Type": "application/json" },
           withCredentials: true,
-          data: {
-            id,
-          },
         },
       );
 
       console.log(response);
+
+      if (response.status === 200) {
+        const updatedProducts = submitted?.filter((item) => item.id !== id);
+        setSubmitted(updatedProducts);
+      }
     } catch (error: any) {
       console.error(error);
     }

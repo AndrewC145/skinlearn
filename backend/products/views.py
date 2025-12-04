@@ -66,3 +66,28 @@ def superuser_dashboard(request: any):
         {"error": "Invalid request method."},
         status=status.HTTP_405_METHOD_NOT_ALLOWED,
     )
+
+
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+@authentication_classes([JWTAuthentication])
+def product_submission_delete(request, pk):
+    if request.method == "DELETE":
+        if request.user.is_superuser:
+            try:
+                instance = ProductSubmission.objects.get(pk=pk)
+                instance.delete()
+
+                return Response(
+                    {"message": "Deleted successfully"}, status=status.HTTP_200_OK
+                )
+            except ProductSubmission.DoesNotExist as e:
+                return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response(
+                {"error": "You are not an admin"}, status=status.HTTP_403_FORBIDDEN
+            )
+    return Response(
+        {"error": "Invalid request method."},
+        status=status.HTTP_405_METHOD_NOT_ALLOWED,
+    )
