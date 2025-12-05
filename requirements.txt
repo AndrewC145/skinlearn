@@ -8,3 +8,7 @@ pytz
 sqlparse
 psycopg2-binary
 django-environ
+beautifulsoup4
+cloudinary
+pillow
+django-cloudinary-storage
