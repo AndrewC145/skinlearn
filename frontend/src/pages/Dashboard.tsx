@@ -17,6 +17,7 @@ type ProductSubmission = {
 function Dashboard() {
   const { token } = useAuth();
   const [submitted, setSubmitted] = useState<any[] | null | undefined>(null);
+  const [showAlert, setShowAlert] = useState<boolean>(false);
 
   const deleteProduct = async (id: number) => {
     try {
@@ -33,9 +34,15 @@ function Dashboard() {
       if (response.status === 200) {
         const updatedProducts = submitted?.filter((item) => item.id !== id);
         setSubmitted(updatedProducts);
+        setShowAlert(true);
+
+        setTimeout(() => {
+          setShowAlert(false);
+        }, 2500);
       }
     } catch (error: any) {
       console.error(error);
+      setShowAlert(false);
     }
   };
 
@@ -66,6 +73,11 @@ function Dashboard() {
   return (
     <section className="h-screen">
       <div className="mt-20 flex flex-col items-center gap-8">
+        {showAlert && (
+          <div className="fixed top-20 flex items-center justify-center">
+            <DashboardAlert />
+          </div>
+        )}
         <h1 className="inline-block text-4xl font-semibold">
           Submitted Products
         </h1>
@@ -82,12 +94,10 @@ function Dashboard() {
               />
             ))}
         </div>
-        {!submitted ? (
-          <div>
-            <h2 className="inline-block text-2xl">
-              No products sent at this time.
-            </h2>
-          </div>
+        {submitted?.length === 0 ? (
+          <h2 className="inline-block text-xl">
+            No products sent at this time.
+          </h2>
         ) : null}
       </div>
     </section>

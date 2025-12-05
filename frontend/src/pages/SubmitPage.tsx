@@ -18,7 +18,7 @@ function SubmitPage() {
     string,
     string[]
   > | null>(null);
-  const [success, setSuccess] = useState<string | undefined>("");
+  const [success, setSuccess] = useState<string | null>(null);
   const [customErr, setCustomErr] = useState<string | null>(null);
 
   const {
@@ -50,6 +50,10 @@ function SubmitPage() {
         setSuccess(response.data.message);
         setFieldErrors(null);
         setCustomErr(null);
+
+        setTimeout(() => {
+          setSuccess(null);
+        }, 2500);
       }
     } catch (error: any) {
       console.error(error);

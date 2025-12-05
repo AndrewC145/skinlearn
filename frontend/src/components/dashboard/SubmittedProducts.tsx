@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from "../../components/ui/card";
 import DeleteAlert from "./DeleteAlert";
+import ProductOverview from "./ProductOverview";
 
 export const title = "Standard Card";
 
@@ -41,9 +42,16 @@ function SubmittedProducts({
           }
           onClick={onClick}
         />
-        <Button variant="default" className="cursor-pointer">
-          View
-        </Button>
+        <ProductOverview
+          title={title}
+          brand={brand}
+          ingredients={ingredients}
+          children={
+            <Button variant="default" className="cursor-pointer">
+              View
+            </Button>
+          }
+        />
       </CardFooter>
     </Card>
   );
