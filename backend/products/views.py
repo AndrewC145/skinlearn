@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import status
-from .serializer import ProductSubmissionSerializer
+from .serializer import ProductSubmissionSerializer, ProductInformationSerializer
 from .models import Products, ProductSubmission
 from rest_framework.throttling import UserRateThrottle
 import re
@@ -91,3 +91,20 @@ def product_submission_delete(request, pk):
         {"error": "Invalid request method."},
         status=status.HTTP_405_METHOD_NOT_ALLOWED,
     )
+
+
+@api_view(["GET"])
+@permission_classes([])
+def get_product(request, pk):
+    if request.method == "GET":
+        try:
+            product = Products.objects.get(pk=pk)
+            serializer = ProductInformationSerializer(product)
+            return Response(
+                {
+                    "Product": serializer.data,
+                },
+                status=status.HTTP_200_OK,
+            )
+        except Products.DoesNotExist as e:
+            return Response({"error": str(e)})

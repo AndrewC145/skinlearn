@@ -86,6 +86,12 @@ class ProductSerializer(serializers.ModelSerializer):
         return product
 
 
+class ProductInformationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Products
+        fields = ["id", "name", "brand", "category", "raw_ingredients", "image"]
+
+
 class ProductSubmissionSerializer(serializers.ModelSerializer):
     ingredients = serializers.ListField(child=serializers.CharField(), write_only=True)
 

@@ -4,6 +4,10 @@ __pycache__/
 *$py.class
 
 comedogenic_ingredients.csv
+skinlearn-products.csv
+
+# Import Commands
+backend/products/management/
 # C extensions
 *.so
 

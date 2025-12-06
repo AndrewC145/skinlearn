@@ -29,6 +29,9 @@ class Products(models.Model):
         max_length=50, null=False, blank=False, choices=PRODUCT_CHOICES
     )
     ingredients = models.ManyToManyField(Ingredients)
+    raw_ingredients = ArrayField(
+        models.CharField(max_length=255), default=list, null=False
+    )
     user_added = models.BooleanField(default=False)
     is_approved = models.BooleanField(default=False)
     created_by = models.ForeignKey(
