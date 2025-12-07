@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Products, ProductSubmission
 from ingredients.models import Ingredients
 from django.contrib.postgres.search import TrigramSimilarity
+from cloudinary.utils import cloudinary_url
 
 
 def validate_name(value):
@@ -87,9 +88,19 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class ProductInformationSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = Products
         fields = ["id", "name", "brand", "category", "raw_ingredients", "image"]
+
+    def get_image(self, obj):
+        if not obj.image:
+            return None
+
+        public_id = obj.image.public_id
+        url, _ = cloudinary_url(public_id)
+        return url
 
 
 class ProductSubmissionSerializer(serializers.ModelSerializer):
