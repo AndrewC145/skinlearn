@@ -14,8 +14,14 @@ import { CirclePlus, SendHorizontal, CircleQuestionMark } from "lucide-react";
 import EmptyRoutine from "../EmptyRoutine";
 import { EmptyContent } from "../ui/empty";
 import { Link } from "react-router";
+import axios from "axios";
+import { useState, useEffect } from "react";
 
 function SearchModal() {
+  const [products, setProducts] = useState([]);
+  const [offset, setOffset] = useState<number>(0);
+
+  const LIMIT = 20;
   return (
     <Dialog>
       <form action="">
@@ -61,10 +67,13 @@ function SearchModal() {
 
 function EmptyRoutineChildren() {
   return (
-    <EmptyContent>
+    <EmptyContent className="flex flex-row">
       <Link to="/submit-product">
-        <Button className="cursor-pointer">Add Product</Button>
+        <Button className="cursor-pointer">Submit Product</Button>
       </Link>
+      <Button variant="outline" className="cursor-pointer">
+        Add custom product
+      </Button>
     </EmptyContent>
   );
 }
