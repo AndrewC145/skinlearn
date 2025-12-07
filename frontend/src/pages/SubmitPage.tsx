@@ -37,7 +37,7 @@ function SubmitPage() {
   const onSubmit = async (data: productFormValues) => {
     try {
       const response: AxiosResponse = await createApi(token).post(
-        "ingredients/submit/",
+        "api/products/submit/",
         data,
         {
           headers: {

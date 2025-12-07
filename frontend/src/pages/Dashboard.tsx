@@ -22,7 +22,7 @@ function Dashboard() {
   const deleteProduct = async (id: number) => {
     try {
       const response: AxiosResponse = await createApi(token).delete(
-        `ingredients/dashboard/delete/${id}/`,
+        `api/products/dashboard/delete/${id}/`,
         {
           headers: { "Content-Type": "application/json" },
           withCredentials: true,
@@ -50,7 +50,7 @@ function Dashboard() {
     const fetchProducts = async () => {
       try {
         const response: AxiosResponse = await createApi(token).get(
-          "ingredients/dashboard",
+          "api/products/dashboard/",
           {
             headers: {
               "Content-Type": "application/json",
@@ -59,7 +59,6 @@ function Dashboard() {
           },
         );
 
-        console.log(response);
         if (response.status === 200) {
           setSubmitted(response.data.submissions);
         }

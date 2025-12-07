@@ -20,7 +20,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   ) => {
     try {
       const response: AxiosResponse = await createApi(token).post(
-        "api/token/",
+        "api/users/token/",
         data,
         {
           headers: { "Content-Type": "application/json" },
@@ -47,7 +47,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   ) => {
     try {
       const response: AxiosResponse = await createApi(token).post(
-        "api/register/",
+        "api/users/register/",
         data,
         {
           headers: {
@@ -67,7 +67,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   const handleLogout: () => Promise<void> = async () => {
     try {
       const response: AxiosResponse = await createApi(token).post(
-        "api/logout/",
+        "api/users/logout/",
         {},
         {
           headers: { "Content-Type": "application/json" },
@@ -89,7 +89,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     const rehydrateToken = async () => {
       try {
         const response = await createApi(null).post(
-          "api/refresh/",
+          "api/users/refresh/",
           {},
           {
             headers: { "Content-Type": "application/json" },

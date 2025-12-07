@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Dialog,
   DialogContent,
@@ -14,14 +15,25 @@ import { CirclePlus, SendHorizontal, CircleQuestionMark } from "lucide-react";
 import EmptyRoutine from "../EmptyRoutine";
 import { EmptyContent } from "../ui/empty";
 import { Link } from "react-router";
-import axios from "axios";
+import { createApi } from "../../api";
 import { useState, useEffect } from "react";
+import type { AxiosResponse } from "axios";
 
 function SearchModal() {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<any>([]);
   const [offset, setOffset] = useState<number>(0);
+  const [hasMore, setHasMore] = useState<boolean>(true);
 
   const LIMIT = 20;
+
+  const fetchData = async () => {
+    try {
+      const response: AxiosResponse = await createApi(null).get("products/");
+    } catch (error: any) {
+      console.error(error);
+    }
+  };
+
   return (
     <Dialog>
       <form action="">

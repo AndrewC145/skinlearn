@@ -36,7 +36,7 @@ function Analyze() {
   const onSubmit = async (data: ingredientsValues) => {
     try {
       const response = await createApi(token).post(
-        "ingredients/analyze/",
+        "api/ingredients/analyze/",
         { data, personalIngredients },
         {
           headers: { "Content-Type": "application/json" },
