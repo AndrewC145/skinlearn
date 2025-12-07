@@ -12,6 +12,7 @@ from .serializer import ProductSubmissionSerializer, ProductInformationSerialize
 from .models import Products, ProductSubmission
 from rest_framework.throttling import UserRateThrottle
 import re
+from rest_framework.pagination import LimitOffsetPagination
 
 
 # Create your views here.
@@ -108,3 +109,27 @@ def get_product(request, pk):
             )
         except Products.DoesNotExist as e:
             return Response({"error": str(e)})
+
+
+class CustomLimitOffsetPagination(LimitOffsetPagination):
+    default_limit = 20
+    max_limit = 50
+
+
+@api_view(["GET"])
+@permission_classes([])
+def list_products(request):
+    if request.method == "GET":
+        products = Products.objects.all().order_by("id")
+
+        product_pagination = CustomLimitOffsetPagination()
+
+        result_page = product_pagination.paginate_queryset(products, request)
+        serializer = ProductInformationSerializer(result_page, many=True)
+
+        paginated_products = product_pagination.get_paginated_response(serializer.data)
+
+        return paginated_products
+    return Response(
+        {"error": "Invalid request method."}, status=status.HTTP_405_METHOD_NOT_ALLOWED
+    )
