@@ -26,9 +26,21 @@ function SearchModal() {
 
   const LIMIT = 20;
 
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   const fetchData = async () => {
     try {
-      const response: AxiosResponse = await createApi(null).get("products/");
+      const response: AxiosResponse =
+        await createApi(null).get("api/products/");
+
+      if (response.status === 200) {
+        const results = response.data.results;
+
+        const data = [...products].concat(results);
+        setProducts(data);
+      }
     } catch (error: any) {
       console.error(error);
     }
