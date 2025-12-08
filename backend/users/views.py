@@ -125,13 +125,13 @@ def logout(request: any):
         )
 
 
-@api_view(["PATCH"])
+@api_view(["PATCH", "GET"])
 @permission_classes([IsAuthenticated])
 @authentication_classes([JWTAuthentication])
-def upload_avoid_ingredients(request: any):
+def upload_avoid_ingredients(request, pk):
     if request.method == "PATCH":
         try:
-            user = request.user
+            user = User.objects.get(pk=pk)
             serializer = AvoidIngredientsSerializer(
                 user, data=request.data, partial=True
             )
@@ -144,6 +144,14 @@ def upload_avoid_ingredients(request: any):
                 return Response(
                     {"error": "Invalid Input"}, status=status.HTTP_400_BAD_REQUEST
                 )
+        except (User.DoesNotExist, TokenError) as err:
+            return Response({"message": str(err)}, status=status.HTTP_400_BAD_REQUEST)
+    elif request.method == "GET":
+        try:
+            user = User.objects.get(pk=pk)
+            serializer = AvoidIngredientsSerializer(user)
+
+            return Response({"ingredients": serializer.data}, status=status.HTTP_200_OK)
         except (User.DoesNotExist, TokenError) as err:
             return Response({"message": str(err)}, status=status.HTTP_400_BAD_REQUEST)
     else:

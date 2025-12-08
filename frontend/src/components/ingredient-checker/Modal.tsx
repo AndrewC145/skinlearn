@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Dialog,
   DialogClose,
@@ -13,7 +14,10 @@ import { Label } from "../ui/label";
 import { Button } from "../ui/button";
 import { X, SendHorizontal } from "lucide-react";
 import type { MouseEventHandler, SetStateAction } from "react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useAuth } from "../../context/AuthContext";
+import { createApi } from "../../api";
+import { type AxiosResponse } from "axios";
 
 type ModalProps = {
   personalIngredients: string[];
@@ -29,10 +33,48 @@ function Modal({
   const [ingredientValue, setIngredientValue] = useState<string>("");
   const [submitted, setIsSubmitted] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
+  const { user, token } = useAuth();
 
   const originalIngredients = useRef<string[]>([]);
 
-  const onSubmit = () => {
+  useEffect(() => {
+    const fetchIngredients = async () => {
+      if (user) {
+        try {
+          const response: AxiosResponse = await createApi(token).get(
+            `api/users/ingredients/${user.id}/`,
+          );
+
+          if (response.status === 200) {
+            setPersonalIngredients(response.data.ingredients.avoid_ingredients);
+          }
+        } catch (error: any) {
+          console.error(error);
+        }
+      }
+    };
+
+    fetchIngredients();
+  }, [user, token, setPersonalIngredients]);
+
+  const onSubmit = async () => {
+    if (user) {
+      try {
+        const response: AxiosResponse = await createApi(token).patch(
+          `api/users/ingredients/${user.id}/`,
+          { avoid_ingredients: personalIngredients },
+          {
+            headers: { "Content-Type": "application/json" },
+            withCredentials: true,
+          },
+        );
+
+        console.log(response);
+      } catch (error: any) {
+        console.error(error);
+      }
+    }
+
     setIsSubmitted(false);
     setOpen(false);
   };
