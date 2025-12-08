@@ -13,6 +13,7 @@ from .models import Products, ProductSubmission
 from rest_framework.throttling import UserRateThrottle
 import re
 from rest_framework.pagination import PageNumberPagination
+from django.db.models import Q
 
 
 # Create your views here.
@@ -124,6 +125,13 @@ def list_products(request):
         products = Products.objects.all().order_by("id")
 
         product_pagination = CustomPageNumberPagination()
+
+        search_query = request.query_params.get("search", None)
+
+        if search_query:
+            products = Products.objects.filter(
+                Q(name__icontains=search_query) | Q(brand__icontains=search_query)
+            )
 
         result_page = product_pagination.paginate_queryset(products, request)
         serializer = ProductInformationSerializer(result_page, many=True)
