@@ -12,7 +12,7 @@ from .serializer import ProductSubmissionSerializer, ProductInformationSerialize
 from .models import Products, ProductSubmission
 from rest_framework.throttling import UserRateThrottle
 import re
-from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.pagination import PageNumberPagination
 
 
 # Create your views here.
@@ -111,9 +111,10 @@ def get_product(request, pk):
             return Response({"error": str(e)})
 
 
-class CustomLimitOffsetPagination(LimitOffsetPagination):
-    default_limit = 20
-    max_limit = 50
+class CustomPageNumberPagination(PageNumberPagination):
+    page_size = 20
+    page_size_query_param = "page_size"
+    max_page_size = 50
 
 
 @api_view(["GET"])
@@ -122,7 +123,7 @@ def list_products(request):
     if request.method == "GET":
         products = Products.objects.all().order_by("id")
 
-        product_pagination = CustomLimitOffsetPagination()
+        product_pagination = CustomPageNumberPagination()
 
         result_page = product_pagination.paginate_queryset(products, request)
         serializer = ProductInformationSerializer(result_page, many=True)
