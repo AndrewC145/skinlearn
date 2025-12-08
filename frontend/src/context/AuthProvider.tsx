@@ -8,10 +8,12 @@ import {
 } from "../types/formTypes";
 import { createApi } from "../api";
 import { type AxiosResponse } from "axios";
+import { usePersonalIngredients } from "./PersonalIngredientsContext";
 
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const { setPersonalIngredients } = usePersonalIngredients();
 
   const navigate: NavigateFunction = useNavigate();
 
@@ -32,10 +34,11 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser({
           id: response.data.id,
           username: response.data.username,
-          avoid_ingredients: response.data.avoid_ingredients,
+
           is_superuser: response.data.superuser,
         });
         setToken(response.data.token.access);
+        setPersonalIngredients(response.data.avoid_ingredients);
       }
     } catch (error: any) {
       throw new Error(error.response.data.detail);
@@ -78,6 +81,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       if (response.status === 200) {
         setToken(null);
         setUser(null);
+        setPersonalIngredients([]);
         navigate("/");
       }
     } catch (error: any) {

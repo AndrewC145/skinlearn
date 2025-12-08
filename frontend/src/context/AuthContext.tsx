@@ -7,7 +7,6 @@ import {
 export type User = {
   id: number;
   username: string;
-  avoid_ingredients: string[];
   is_superuser: boolean;
 };
 
