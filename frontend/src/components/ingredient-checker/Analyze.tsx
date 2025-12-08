@@ -14,10 +14,12 @@ import ComedogenicList from "./ComedogenicList";
 import Error from "../Error";
 import type { MouseEventHandler } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { usePersonalIngredients } from "../../context/PersonalIngredientsContext";
 
 function Analyze() {
   const { token } = useAuth();
-  const [personalIngredients, setPersonalIngredients] = useState<string[]>([]);
+  const { personalIngredients, setPersonalIngredients } =
+    usePersonalIngredients();
   const [comedogenicIngredients, setComedogenicIngredients] = useState<
     string[]
   >([]);
@@ -101,6 +103,14 @@ function Analyze() {
             <Modal
               personalIngredients={personalIngredients}
               setPersonalIngredients={setPersonalIngredients}
+              trigger={
+                <Button
+                  type="button"
+                  className="font-figtree cursor-pointer bg-blue-600 px-4 py-6 text-base hover:bg-blue-700"
+                >
+                  Add Your Own Ingredients
+                </Button>
+              }
             />
           </div>
         </form>

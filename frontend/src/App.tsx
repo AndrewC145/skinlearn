@@ -10,38 +10,41 @@ import Builder from "./pages/Builder";
 import SubmitPage from "./pages/SubmitPage";
 import Protected from "./components/Protected";
 import Dashboard from "./pages/Dashboard";
+import PersonalIngredientsProvider from "./context/PersonalIngredientsProvider";
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Header />
-        <main>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/pore-clogging-checker" element={<Checker />} />
-            <Route path="/routine-builder" element={<Builder />} />
-            <Route
-              path="/submit-product"
-              element={
-                <Protected>
-                  <SubmitPage />
-                </Protected>
-              }
-            />
-            <Route
-              path="/dashboard"
-              element={
-                <Protected superuserOnly>
-                  <Dashboard />
-                </Protected>
-              }
-            />
-          </Routes>
-        </main>
-        <Footer />
+        <PersonalIngredientsProvider>
+          <Header />
+          <main>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/pore-clogging-checker" element={<Checker />} />
+              <Route path="/routine-builder" element={<Builder />} />
+              <Route
+                path="/submit-product"
+                element={
+                  <Protected>
+                    <SubmitPage />
+                  </Protected>
+                }
+              />
+              <Route
+                path="/dashboard"
+                element={
+                  <Protected superuserOnly>
+                    <Dashboard />
+                  </Protected>
+                }
+              />
+            </Routes>
+          </main>
+          <Footer />
+        </PersonalIngredientsProvider>
       </AuthProvider>
     </BrowserRouter>
   );

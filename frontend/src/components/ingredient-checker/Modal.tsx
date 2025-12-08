@@ -18,9 +18,14 @@ import { useState, useRef } from "react";
 type ModalProps = {
   personalIngredients: string[];
   setPersonalIngredients: React.Dispatch<SetStateAction<string[]>>;
+  trigger: React.ReactNode;
 };
 
-function Modal({ personalIngredients, setPersonalIngredients }: ModalProps) {
+function Modal({
+  personalIngredients,
+  setPersonalIngredients,
+  trigger,
+}: ModalProps) {
   const [ingredientValue, setIngredientValue] = useState<string>("");
   const [submitted, setIsSubmitted] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
@@ -33,7 +38,7 @@ function Modal({ personalIngredients, setPersonalIngredients }: ModalProps) {
   };
 
   const addIngredient = (ingredient: string) => {
-    if (!personalIngredients.includes(ingredient)) {
+    if (personalIngredients && !personalIngredients.includes(ingredient)) {
       setPersonalIngredients((prev) => [...prev, ingredient]);
     }
     setIngredientValue("");
@@ -61,14 +66,7 @@ function Modal({ personalIngredients, setPersonalIngredients }: ModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <Button
-          type="button"
-          className="font-figtree cursor-pointer bg-blue-600 px-4 py-6 text-base hover:bg-blue-700"
-        >
-          Add Your Own Ingredients
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="bg-[#fffbf3]">
         <DialogHeader>
           <DialogTitle>Add Comedogenic Ingredients</DialogTitle>
