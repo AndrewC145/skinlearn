@@ -51,6 +51,13 @@ function Modal({
         } catch (error: any) {
           console.error(error);
         }
+      } else {
+        const ingredients = localStorage.getItem("avoid_ingredients");
+        if (ingredients === null) {
+          setPersonalIngredients([]);
+        } else {
+          setPersonalIngredients(JSON.parse(ingredients));
+        }
       }
     };
 
@@ -73,6 +80,11 @@ function Modal({
       } catch (error: any) {
         console.error(error);
       }
+    } else {
+      localStorage.setItem(
+        "avoid_ingredients",
+        JSON.stringify(personalIngredients),
+      );
     }
 
     setIsSubmitted(false);
