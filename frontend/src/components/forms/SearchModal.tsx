@@ -23,15 +23,7 @@ import Product from "../../components/Product";
 import useDebounce from "../../hooks/useDebounce";
 import { type RoutineProductType } from "../../types/RoutineProductType";
 import { useAuth } from "../../context/AuthContext";
-
-type ProductType = {
-  id: number;
-  name: string;
-  brand: string;
-  image: string;
-  category: string;
-  raw_ingredients: string[];
-};
+import { type ProductType } from "../../types/ProductType";
 
 function SearchModal({
   setRoutineProducts,

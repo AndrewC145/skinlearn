@@ -4,6 +4,7 @@ import EmptyRoutine from "./EmptyRoutine";
 import SearchModal from "./forms/SearchModal";
 import { PackageSearch } from "lucide-react";
 import { type RoutineProductType } from "../types/RoutineProductType";
+import { type ProductType } from "../types/ProductType";
 
 function Routine({
   day,
@@ -16,6 +17,13 @@ function Routine({
   products: Set<RoutineProductType>;
   setProducts: React.Dispatch<SetStateAction<Set<RoutineProductType>>>;
 }) {
+  const removeProduct = async (p: ProductType) => {
+    setProducts((prev) => {
+      prev.delete(p);
+      return new Set(prev);
+    });
+  };
+
   return (
     <div className="flex flex-col items-center">
       <h2 className="text-xl font-semibold">{day} Skincare Routine</h2>
