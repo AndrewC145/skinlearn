@@ -16,11 +16,13 @@ import EmptyRoutine from "../EmptyRoutine";
 import { EmptyContent } from "../ui/empty";
 import { Link } from "react-router";
 import { createApi } from "../../api";
-import { useState, useEffect } from "react";
+import { useState, useEffect, type SetStateAction } from "react";
 import type { AxiosResponse } from "axios";
 import InfiniteScroll from "react-infinite-scroll-component";
 import Product from "../../components/Product";
 import useDebounce from "../../hooks/useDebounce";
+import { type RoutineProductType } from "../../types/RoutineProductType";
+import { useAuth } from "../../context/AuthContext";
 
 type ProductType = {
   id: number;
@@ -31,11 +33,16 @@ type ProductType = {
   raw_ingredients: string[];
 };
 
-function SearchModal() {
+function SearchModal({
+  setRoutineProducts,
+}: {
+  setRoutineProducts: React.Dispatch<SetStateAction<Set<RoutineProductType>>>;
+}) {
   const [products, setProducts] = useState<ProductType[]>([]);
   const [searchText, setSearchText] = useState<string>("");
   const [page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
+  const { user, token } = useAuth();
 
   const debounce = useDebounce(searchText, 450);
 
@@ -74,6 +81,10 @@ function SearchModal() {
     } catch (error: any) {
       console.error(error);
     }
+  };
+
+  const addProduct = async (p: ProductType) => {
+    setRoutineProducts((prev) => new Set(prev.add(p)));
   };
 
   return (
@@ -122,6 +133,7 @@ function SearchModal() {
                     productName={p.brand + " " + p.name}
                     image={p.image}
                     tag={p.category}
+                    onClick={() => addProduct(p)}
                   />
                 ))
               ) : (

@@ -1,15 +1,21 @@
-import { useState, useEffect } from "react";
+import { useEffect, type SetStateAction } from "react";
 import Product from "./Product";
 import EmptyRoutine from "./EmptyRoutine";
 import SearchModal from "./forms/SearchModal";
 import { PackageSearch } from "lucide-react";
-type ProductTypes = {
-  productName: string;
-  tag: string;
-};
+import { type RoutineProductType } from "../types/RoutineProductType";
 
-function Routine({ day, icon }: { day: string; icon: React.ReactNode }) {
-  const [products, setProducts] = useState<ProductTypes | null>(null);
+function Routine({
+  day,
+  icon,
+  products,
+  setProducts,
+}: {
+  day: string;
+  icon: React.ReactNode;
+  products: Set<RoutineProductType>;
+  setProducts: React.Dispatch<SetStateAction<Set<RoutineProductType>>>;
+}) {
   return (
     <div className="flex flex-col items-center">
       <h2 className="text-xl font-semibold">{day} Skincare Routine</h2>
@@ -18,17 +24,26 @@ function Routine({ day, icon }: { day: string; icon: React.ReactNode }) {
           {icon}
           <span>Routine</span>
         </div>
-        <SearchModal />
+        <SearchModal setRoutineProducts={setProducts} />
       </div>
-      <div className="mt-4">
-        {!products ? (
+      <div className={`mt-4 ${products.size && "grid grid-cols-3 gap-4"}`}>
+        {!products.size ? (
           <EmptyRoutine
             icon={<PackageSearch />}
             title="No Products Yet"
             description="You haven't added any projects yet for this routine. Get started
           by adding your first product."
           />
-        ) : null}
+        ) : (
+          Array.from(products).map((p: RoutineProductType, index: number) => (
+            <Product
+              key={index}
+              productName={p.name}
+              image={p.image}
+              tag={p.category}
+            />
+          ))
+        )}
       </div>
     </div>
   );

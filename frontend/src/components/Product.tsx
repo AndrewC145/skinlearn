@@ -11,7 +11,7 @@ function Product({
   productName: string;
   image: string;
   tag: string;
-  onClick: () => void;
+  onClick?: () => void;
 }) {
   return (
     <div className="rounded-xl border-1 border-black p-4">
@@ -22,15 +22,17 @@ function Product({
         </div>
         <div className="mt-auto flex items-center justify-between pt-2">
           <Badge variant="default">{tag}</Badge>
-          <Button
-            onClick={onClick}
-            aria-label="add"
-            variant="outline"
-            size="icon"
-            className="cursor-pointer"
-          >
-            <Plus />
-          </Button>
+          {onClick ? (
+            <Button
+              onClick={onClick}
+              aria-label="add"
+              variant="outline"
+              size="icon"
+              className="cursor-pointer"
+            >
+              <Plus />
+            </Button>
+          ) : null}
         </div>
       </div>
     </div>
