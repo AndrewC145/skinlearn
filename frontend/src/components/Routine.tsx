@@ -5,6 +5,7 @@ import SearchModal from "./forms/SearchModal";
 import { PackageSearch } from "lucide-react";
 import { type RoutineProductType } from "../types/RoutineProductType";
 import { type ProductType } from "../types/ProductType";
+import { Trash2 } from "lucide-react";
 
 function Routine({
   day,
@@ -17,7 +18,7 @@ function Routine({
   products: Set<RoutineProductType>;
   setProducts: React.Dispatch<SetStateAction<Set<RoutineProductType>>>;
 }) {
-  const removeProduct = async (p: ProductType) => {
+  const removeProduct = async (p: RoutineProductType) => {
     setProducts((prev) => {
       prev.delete(p);
       return new Set(prev);
@@ -49,6 +50,8 @@ function Routine({
               productName={p.name}
               image={p.image}
               tag={p.category}
+              icon={<Trash2 />}
+              onClick={() => removeProduct(p)}
             />
           ))
         )}

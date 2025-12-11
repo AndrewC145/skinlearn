@@ -1,18 +1,23 @@
 import { Badge } from "../components/ui/badge";
-import { Plus } from "lucide-react";
 import { Button } from "../components/ui/button";
+
+type ProductProps = {
+  productName: string;
+  image: string;
+  tag: string;
+  onClick?: () => void;
+  icon: React.ReactNode;
+  className?: string;
+};
 
 function Product({
   productName,
   image,
   tag,
   onClick,
-}: {
-  productName: string;
-  image: string;
-  tag: string;
-  onClick?: () => void;
-}) {
+  icon,
+  className,
+}: ProductProps) {
   return (
     <div className="rounded-xl border-1 border-black p-4">
       <div className="flex h-full flex-col">
@@ -30,7 +35,7 @@ function Product({
               size="icon"
               className="cursor-pointer"
             >
-              <Plus />
+              {icon}
             </Button>
           ) : null}
         </div>

@@ -7,11 +7,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { Search } from "lucide-react";
+import { Search, CirclePlus, CircleQuestionMark, Plus } from "lucide-react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
-import { CirclePlus, CircleQuestionMark } from "lucide-react";
 import EmptyRoutine from "../EmptyRoutine";
 import { EmptyContent } from "../ui/empty";
 import { Link } from "react-router";
@@ -125,6 +124,7 @@ function SearchModal({
                     productName={p.brand + " " + p.name}
                     image={p.image}
                     tag={p.category}
+                    icon={<Plus />}
                     onClick={() => addProduct(p)}
                   />
                 ))
