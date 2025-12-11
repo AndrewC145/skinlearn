@@ -5,6 +5,7 @@ from products.views import (
     superuser_dashboard,
     product_submission_delete,
     submit_product,
+    save_and_analyze_product,
 )
 
 urlpatterns = [
@@ -17,4 +18,5 @@ urlpatterns = [
         product_submission_delete,
         name="superuser_dashboard_delete",
     ),
+    path("save/", save_and_analyze_product, name="save_product"),
 ]

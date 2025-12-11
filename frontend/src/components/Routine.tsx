@@ -18,6 +18,8 @@ function Routine({
   products: Set<RoutineProductType>;
   setProducts: React.Dispatch<SetStateAction<Set<RoutineProductType>>>;
 }) {
+  const { user } = useAuth();
+
   const removeProduct = async (p: RoutineProductType) => {
     setProducts((prev) => {
       prev.delete(p);
@@ -33,7 +35,10 @@ function Routine({
           {icon}
           <span>Routine</span>
         </div>
-        <SearchModal setRoutineProducts={setProducts} />
+        <SearchModal
+          routineProducts={products}
+          setRoutineProducts={setProducts}
+        />
       </div>
       <div
         className={`mt-8 ${products.size && "grid max-h-[350px] grid-cols-1 gap-4 overflow-y-auto md:grid-cols-2"}`}

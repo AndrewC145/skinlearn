@@ -158,3 +158,13 @@ class ProductSubmissionSerializer(serializers.ModelSerializer):
 
     def get_ingredient_names(self, obj):
         return [i.name for i in obj.ingredients.all()]
+
+
+class RoutineProductSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField(required=False)
+    image = serializers.CharField(required=False)
+
+
+class RoutineSerializer(serializers.Serializer):
+    product = RoutineProductSerializer()

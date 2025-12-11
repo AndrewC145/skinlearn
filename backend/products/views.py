@@ -8,7 +8,11 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import status
-from .serializer import ProductSubmissionSerializer, ProductInformationSerializer
+from .serializer import (
+    ProductSubmissionSerializer,
+    ProductInformationSerializer,
+    RoutineSerializer,
+)
 from .models import Products, ProductSubmission
 from rest_framework.throttling import UserRateThrottle
 import re
@@ -145,9 +149,42 @@ def list_products(request):
     )
 
 
-@api_view(["PATCH"])
+@api_view(["POST"])
 @permission_classes([])
-def save_product(request):
-    if request.method == "PATCH":
-        if request.user.is_authenticated:
-            pass
+def save_and_analyze_product(request):
+    if request.method == "POST":
+        serializer = RoutineSerializer(data=request.data)
+        if serializer.is_valid():
+            product_data = serializer.validated_data["product"]
+            product_id = product_data["id"]
+            try:
+                product = Products.objects.get(id=product_id)
+            except Products.DoesNotExist as e:
+                return Response(
+                    {"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND
+                )
+
+            if request.user.is_authenticated:
+                request.user.products.add(product)
+                avoid_ing = request.user.avoid_ingredients
+            else:
+                avoid_ing = request.data.get("personalIngredients", [])
+
+            comedogenic_ingredients = handle_ingredients_check(
+                product.raw_ingredients, avoid_ing
+            )
+            analysis = {
+                "id": product.id,
+                "name": product.name,
+                "brand": product.brand,
+                "comedogenic_ingredients": comedogenic_ingredients,
+            }
+
+            return Response({"analysis": analysis}, status=status.HTTP_200_OK)
+
+
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+@authentication_classes([JWTAuthentication])
+def delete_user_product(request):
+    pass

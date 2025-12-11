@@ -25,8 +25,10 @@ import { useAuth } from "../../context/AuthContext";
 import { type ProductType } from "../../types/ProductType";
 
 function SearchModal({
+  routineProducts,
   setRoutineProducts,
 }: {
+  routineProducts: Set<RoutineProductType>;
   setRoutineProducts: React.Dispatch<SetStateAction<Set<RoutineProductType>>>;
 }) {
   const [products, setProducts] = useState<ProductType[]>([]);
@@ -76,6 +78,26 @@ function SearchModal({
 
   const addProduct = async (p: ProductType) => {
     setRoutineProducts((prev) => new Set(prev.add(p)));
+    if (user) {
+      try {
+        const response: AxiosResponse = await createApi(token).post(
+          "save/",
+          {
+            product: p,
+          },
+          {
+            headers: { "Content-Type": "application/json" },
+            withCredentials: true,
+          },
+        );
+
+        console.log(response);
+      } catch (error: any) {
+        console.error(error);
+      }
+    } else {
+      localStorage.setItem("products", JSON.stringify(routineProducts));
+    }
   };
 
   return (
