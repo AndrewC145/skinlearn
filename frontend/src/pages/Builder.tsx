@@ -3,7 +3,6 @@ import Routine from "../components/Routine";
 import { Sun, Moon } from "lucide-react";
 import { useState } from "react";
 import { type RoutineProductType } from "../types/RoutineProductType";
-import { useAuth } from "../context/AuthContext";
 
 function Builder() {
   const [dayProducts, setDayProducts] = useState<Set<RoutineProductType>>(
@@ -12,7 +11,6 @@ function Builder() {
   const [nightProducts, setNightProducts] = useState<Set<RoutineProductType>>(
     new Set([]),
   );
-  const { user } = useAuth();
 
   return (
     <section className="flex min-h-screen items-center justify-center py-8">

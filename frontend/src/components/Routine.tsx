@@ -4,8 +4,8 @@ import EmptyRoutine from "./EmptyRoutine";
 import SearchModal from "./forms/SearchModal";
 import { PackageSearch } from "lucide-react";
 import { type RoutineProductType } from "../types/RoutineProductType";
-import { type ProductType } from "../types/ProductType";
 import { Trash2 } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
 function Routine({
   day,

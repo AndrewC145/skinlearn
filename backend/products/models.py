@@ -1,6 +1,5 @@
 from django.db import models
 from ingredients.models import Ingredients
-from users.models import User
 from cloudinary.models import CloudinaryField
 from django.contrib.postgres.fields import ArrayField
 
@@ -35,7 +34,11 @@ class Products(models.Model):
     user_added = models.BooleanField(default=False)
     is_approved = models.BooleanField(default=False)
     created_by = models.ForeignKey(
-        User, null=True, blank=False, on_delete=models.SET_NULL
+        "users.User",
+        null=True,
+        blank=False,
+        on_delete=models.SET_NULL,
+        related_name="created_products",
     )
     created_at = models.DateTimeField(auto_now_add=True)
     image = CloudinaryField("image", null=True, blank=True)
@@ -49,5 +52,5 @@ class ProductSubmission(models.Model):
         models.CharField(max_length=255), default=list, null=False
     )
     created_by = models.ForeignKey(
-        User, null=True, blank=False, on_delete=models.SET_NULL
+        "users.User", null=True, blank=False, on_delete=models.SET_NULL
     )

@@ -14,6 +14,7 @@ from rest_framework.throttling import UserRateThrottle
 import re
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
+from ingredients.views import handle_ingredients_check
 
 
 # Create your views here.
@@ -142,3 +143,11 @@ def list_products(request):
     return Response(
         {"error": "Invalid request method."}, status=status.HTTP_405_METHOD_NOT_ALLOWED
     )
+
+
+@api_view(["PATCH"])
+@permission_classes([])
+def save_product(request):
+    if request.method == "PATCH":
+        if request.user.is_authenticated:
+            pass

@@ -28,21 +28,9 @@ def check_ingredients(request: any):
             if serializer.is_valid():
                 ingredients = serializer.validated_data.get("ingredients", "")
 
-                parsed = [
-                    s.strip().lower()
-                    for s in re.split(r",(?!\s?\d+(?:,\d+)*-\w)", ingredients)
-                ]
-
-                pore_clog_set = (
-                    Ingredients.objects.filter(name__in=parsed)
-                    .filter(category="comedogenic")
-                    .values_list("name", flat=True)
+                comedogenic_ingredients = handle_ingredients_check(
+                    ingredients, avoid_ing
                 )
-                personal_avoids = [ing for ing in avoid_ing if ing.lower() in parsed]
-
-                comedogenic_ingredients = list(pore_clog_set)
-                comedogenic_ingredients.extend(personal_avoids)
-
                 return Response(
                     {
                         "message": "handled ingredients",
@@ -68,6 +56,23 @@ def check_ingredients(request: any):
             {"message": "Invalid HTTP method"},
             status=status.HTTP_405_METHOD_NOT_ALLOWED,
         )
+
+
+def handle_ingredients_check(ingredients, avoid_ing):
+    parsed = [
+        s.strip().lower() for s in re.split(r",(?!\s?\d+(?:,\d+)*-\w)", ingredients)
+    ]
+
+    pore_clog_set = (
+        Ingredients.objects.filter(name__in=parsed)
+        .filter(category="comedogenic")
+        .values_list("name", flat=True)
+    )
+    personal_avoids = [ing for ing in avoid_ing if ing.lower() in parsed]
+
+    comedogenic_ingredients = list(pore_clog_set)
+    comedogenic_ingredients.extend(personal_avoids)
+    return comedogenic_ingredients
 
 
 @api_view(["GET"])

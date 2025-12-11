@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MinLengthValidator
+from products.models import Products
 
 
 # Create your models here.
@@ -43,3 +44,4 @@ class User(AbstractUser):
     avoid_ingredients = ArrayField(
         models.CharField(max_length=80), blank=True, null=True
     )
+    products = models.ManyToManyField(Products, related_name="users")
