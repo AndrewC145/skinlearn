@@ -35,7 +35,9 @@ function Routine({
         </div>
         <SearchModal setRoutineProducts={setProducts} />
       </div>
-      <div className={`mt-4 ${products.size && "grid grid-cols-3 gap-4"}`}>
+      <div
+        className={`mt-8 ${products.size && "grid max-h-[350px] grid-cols-1 gap-4 overflow-y-auto md:grid-cols-2"}`}
+      >
         {!products.size ? (
           <EmptyRoutine
             icon={<PackageSearch />}

@@ -15,10 +15,10 @@ function Builder() {
   const { user } = useAuth();
 
   return (
-    <section className="flex h-screen items-center justify-center">
+    <section className="flex min-h-screen items-center justify-center py-8">
       <div className="flex flex-col gap-20">
         <RoutineTitle />
-        <div className="flex justify-between">
+        <div className="flex justify-between gap-8 px-8">
           <Routine
             day="Day"
             products={dayProducts}
