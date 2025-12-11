@@ -59,9 +59,12 @@ def check_ingredients(request: any):
 
 
 def handle_ingredients_check(ingredients, avoid_ing):
-    parsed = [
-        s.strip().lower() for s in re.split(r",(?!\s?\d+(?:,\d+)*-\w)", ingredients)
-    ]
+    if isinstance(ingredients, list):
+        parsed = [s.strip().lower() for s in ingredients if isinstance(s, str)]
+    else:
+        parsed = [
+            s.strip().lower() for s in re.split(r",(?!\s?\d+(?:,\d+)*-\w)", ingredients)
+        ]
 
     pore_clog_set = (
         Ingredients.objects.filter(name__in=parsed)

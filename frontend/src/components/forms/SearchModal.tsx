@@ -78,25 +78,24 @@ function SearchModal({
 
   const addProduct = async (p: ProductType) => {
     setRoutineProducts((prev) => new Set(prev.add(p)));
-    if (user) {
-      try {
-        const response: AxiosResponse = await createApi(token).post(
-          "save/",
-          {
-            product: p,
-          },
-          {
-            headers: { "Content-Type": "application/json" },
-            withCredentials: true,
-          },
-        );
-
-        console.log(response);
-      } catch (error: any) {
-        console.error(error);
-      }
-    } else {
+    if (!user)
       localStorage.setItem("products", JSON.stringify(routineProducts));
+
+    try {
+      const response: AxiosResponse = await createApi(token).post(
+        "api/products/save/",
+        {
+          product: p,
+        },
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        },
+      );
+
+      console.log(response);
+    } catch (error: any) {
+      console.error(error);
     }
   };
 
