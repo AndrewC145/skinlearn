@@ -103,6 +103,22 @@ class ProductInformationSerializer(serializers.ModelSerializer):
         return url
 
 
+class SimpleProductSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Products
+        fields = ["id", "name", "category", "image"]
+
+    def get_image(self, obj):
+        if not obj.image:
+            return None
+
+        public_id = obj.image.public_id
+        url, _ = cloudinary_url(public_id)
+        return url
+
+
 class ProductSubmissionSerializer(serializers.ModelSerializer):
     ingredients = serializers.ListField(child=serializers.CharField(), write_only=True)
 

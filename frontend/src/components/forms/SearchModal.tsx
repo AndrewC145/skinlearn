@@ -96,7 +96,7 @@ function SearchModal({
       );
 
       if (response.status === 200) {
-        setRoutineProducts((prev) => new Set(prev.add(p)));
+        setRoutineProducts((prev) => new Set([...prev, p]));
       }
       console.log(response);
     } catch (error: any) {

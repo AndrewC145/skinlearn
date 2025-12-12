@@ -26,6 +26,9 @@ function Builder() {
           );
 
           console.log(response);
+          if (response.status === 200) {
+            setDayProducts(response.data.dayProducts);
+          }
         } catch (error: any) {
           console.error(error);
         }

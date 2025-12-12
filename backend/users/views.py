@@ -18,6 +18,7 @@ from .serializer import (
     CustomTokenObtainPairSerializer,
     AvoidIngredientsSerializer,
 )
+from products.serializer import SimpleProductSerializer
 from django.contrib.auth import get_user_model
 from rest_framework.throttling import AnonRateThrottle
 import environ
@@ -168,8 +169,13 @@ def get_user_products(request, pk):
     if request.method == "GET":
         try:
             user = User.objects.get(pk=pk)
-            serializer = UserSerializer(user).data
+            day_products = user.day_products.all()
+            day_products_serializer = SimpleProductSerializer(
+                day_products, many=True
+            ).data
 
-            return Response({"data": serializer}, status=status.HTTP_200_OK)
+            return Response(
+                {"dayProducts": day_products_serializer}, status=status.HTTP_200_OK
+            )
         except User.DoesNotExist as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
