@@ -38,7 +38,14 @@ class RegisterSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "username", "avoid_ingredients", "is_superuser"]
+        fields = [
+            "id",
+            "username",
+            "avoid_ingredients",
+            "is_superuser",
+            "day_products",
+            "night_products",
+        ]
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):

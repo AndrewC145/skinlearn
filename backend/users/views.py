@@ -159,3 +159,17 @@ def upload_avoid_ingredients(request, pk):
             {"error": "Invalid request method."},
             status=status.HTTP_405_METHOD_NOT_ALLOWED,
         )
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+@authentication_classes([JWTAuthentication])
+def get_user_products(request, pk):
+    if request.method == "GET":
+        try:
+            user = User.objects.get(pk=pk)
+            serializer = UserSerializer(user).data
+
+            return Response({"data": serializer}, status=status.HTTP_200_OK)
+        except User.DoesNotExist as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

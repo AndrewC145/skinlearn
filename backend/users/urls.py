@@ -11,4 +11,5 @@ urlpatterns = [
         views.upload_avoid_ingredients,
         name="add_avoid_ingredients",
     ),
+    path("products/<int:pk>/", views.get_user_products, name="get_user_products"),
 ]

@@ -158,6 +158,7 @@ def save_and_analyze_product(request):
             product_data = serializer.validated_data["product"]
             product_id = product_data["id"]
             day_routine = serializer.validated_data["day_routine"]
+
             try:
                 product = Products.objects.get(id=product_id)
             except Products.DoesNotExist as e:

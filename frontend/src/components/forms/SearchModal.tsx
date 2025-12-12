@@ -38,7 +38,7 @@ function SearchModal({
   const [searchText, setSearchText] = useState<string>("");
   const [page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const { personalIngredients } = usePersonalIngredients();
 
   const debounce = useDebounce(searchText, 450);
@@ -82,7 +82,7 @@ function SearchModal({
 
   const addProduct = async (p: ProductType) => {
     try {
-      const response: AxiosResponse = await createApi(null).post(
+      const response: AxiosResponse = await createApi(token || null).post(
         "api/products/save/",
         {
           product: p,
