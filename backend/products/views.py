@@ -157,6 +157,7 @@ def save_and_analyze_product(request):
         if serializer.is_valid():
             product_data = serializer.validated_data["product"]
             product_id = product_data["id"]
+            day_routine = serializer.validated_data["day_routine"]
             try:
                 product = Products.objects.get(id=product_id)
             except Products.DoesNotExist as e:
@@ -165,7 +166,10 @@ def save_and_analyze_product(request):
                 )
 
             if request.user.is_authenticated:
-                request.user.products.add(product)
+                if day_routine:
+                    request.user.day_products.add(product)
+                else:
+                    request.user.night_products.add(product)
                 avoid_ing = request.user.avoid_ingredients
             else:
                 avoid_ing = request.data.get("personalIngredients", [])

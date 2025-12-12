@@ -13,7 +13,7 @@ function Routine({
   products,
   setProducts,
 }: {
-  day: string;
+  day: boolean;
   icon: React.ReactNode;
   products: Set<RoutineProductType>;
   setProducts: React.Dispatch<SetStateAction<Set<RoutineProductType>>>;
@@ -36,6 +36,7 @@ function Routine({
           <span>Routine</span>
         </div>
         <SearchModal
+          day={day}
           routineProducts={products}
           setRoutineProducts={setProducts}
         />

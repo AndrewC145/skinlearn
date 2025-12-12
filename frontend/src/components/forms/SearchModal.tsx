@@ -22,12 +22,15 @@ import Product from "../../components/Product";
 import useDebounce from "../../hooks/useDebounce";
 import { type RoutineProductType } from "../../types/RoutineProductType";
 import { useAuth } from "../../context/AuthContext";
+import { usePersonalIngredients } from "../../context/PersonalIngredientsContext";
 import { type ProductType } from "../../types/ProductType";
 
 function SearchModal({
+  day,
   routineProducts,
   setRoutineProducts,
 }: {
+  day: boolean;
   routineProducts: Set<RoutineProductType>;
   setRoutineProducts: React.Dispatch<SetStateAction<Set<RoutineProductType>>>;
 }) {
@@ -35,7 +38,8 @@ function SearchModal({
   const [searchText, setSearchText] = useState<string>("");
   const [page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
-  const { user, token } = useAuth();
+  const { user } = useAuth();
+  const { personalIngredients } = usePersonalIngredients();
 
   const debounce = useDebounce(searchText, 450);
 
@@ -77,15 +81,13 @@ function SearchModal({
   };
 
   const addProduct = async (p: ProductType) => {
-    setRoutineProducts((prev) => new Set(prev.add(p)));
-    if (!user)
-      localStorage.setItem("products", JSON.stringify(routineProducts));
-
     try {
-      const response: AxiosResponse = await createApi(token).post(
+      const response: AxiosResponse = await createApi(null).post(
         "api/products/save/",
         {
           product: p,
+          day_routine: day,
+          personalIngredients: personalIngredients,
         },
         {
           headers: { "Content-Type": "application/json" },
@@ -93,10 +95,16 @@ function SearchModal({
         },
       );
 
+      if (response.status === 200) {
+        setRoutineProducts((prev) => new Set(prev.add(p)));
+      }
       console.log(response);
     } catch (error: any) {
       console.error(error);
     }
+
+    if (!user)
+      localStorage.setItem("products", JSON.stringify(routineProducts));
   };
 
   return (

@@ -168,3 +168,4 @@ class RoutineProductSerializer(serializers.Serializer):
 
 class RoutineSerializer(serializers.Serializer):
     product = RoutineProductSerializer()
+    day_routine = serializers.BooleanField(required=True)

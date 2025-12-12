@@ -1,7 +1,7 @@
 import RoutineTitle from "../components/RoutineTitle";
 import Routine from "../components/Routine";
 import { Sun, Moon } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { type RoutineProductType } from "../types/RoutineProductType";
 
 function Builder() {
@@ -18,13 +18,13 @@ function Builder() {
         <RoutineTitle />
         <div className="flex justify-between gap-8 px-8">
           <Routine
-            day="Day"
+            day={true}
             products={dayProducts}
             setProducts={setDayProducts}
             icon={<Sun />}
           />
           <Routine
-            day="Night"
+            day={false}
             products={nightProducts}
             setProducts={setNightProducts}
             icon={<Moon />}
