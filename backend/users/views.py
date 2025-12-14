@@ -174,8 +174,17 @@ def get_user_products(request, pk):
                 day_products, many=True
             ).data
 
+            night_products = user.night_products.all()
+            night_products_serializer = SimpleProductSerializer(
+                night_products, many=True
+            ).data
+
             return Response(
-                {"dayProducts": day_products_serializer}, status=status.HTTP_200_OK
+                {
+                    "dayProducts": day_products_serializer,
+                    "nightProducts": night_products_serializer,
+                },
+                status=status.HTTP_200_OK,
             )
         except User.DoesNotExist as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

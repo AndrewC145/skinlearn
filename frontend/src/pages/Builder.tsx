@@ -27,7 +27,8 @@ function Builder() {
 
           console.log(response);
           if (response.status === 200) {
-            setDayProducts(response.data.dayProducts);
+            setDayProducts(new Set(response.data.dayProducts));
+            setNightProducts(new Set(response.data.nightProducts));
           }
         } catch (error: any) {
           console.error(error);
