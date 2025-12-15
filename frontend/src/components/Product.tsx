@@ -7,22 +7,14 @@ type ProductProps = {
   tag: string;
   onClick?: () => void;
   icon: React.ReactNode;
-  className?: string;
 };
 
-function Product({
-  productName,
-  image,
-  tag,
-  onClick,
-  icon,
-  className,
-}: ProductProps) {
+function Product({ productName, image, tag, onClick, icon }: ProductProps) {
   return (
-    <div className="rounded-xl border-1 border-black p-4">
+    <div className="w-full rounded-xl border-1 border-black p-4">
       <div className="flex h-full flex-col">
-        <h3 className="mb-4 text-sm">{productName}</h3>
-        <div className="flex flex-grow items-center justify-center">
+        <h3 className="mb-4 max-w-[200px] text-sm">{productName}</h3>
+        <div className="flex h-40 flex-grow items-center justify-center">
           <img className="size-40 object-cover" src={image} />
         </div>
         <div className="mt-auto flex items-center justify-between pt-2">
