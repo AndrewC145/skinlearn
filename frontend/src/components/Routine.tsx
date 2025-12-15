@@ -9,6 +9,7 @@ import { Trash2 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import type { AxiosResponse } from "axios";
 import { createApi } from "../api";
+import { useRoutine } from "../context/RoutineContext";
 
 function Routine({
   day,
@@ -22,8 +23,10 @@ function Routine({
   setProducts: React.Dispatch<SetStateAction<Set<RoutineProductType>>>;
 }) {
   const { user, token } = useAuth();
+  const { dayProductIds, nightProductIds } = useRoutine();
 
   const removeProduct = async (p: RoutineProductType) => {
+    const productId = p.id;
     if (user) {
       try {
         const response: AxiosResponse = await createApi(token).delete(
@@ -36,6 +39,7 @@ function Routine({
         );
 
         if (response.status === 200) {
+          removeFromProductIds(productId, day);
           setProducts((prev) => {
             prev.delete(p);
             return new Set(prev);
@@ -45,12 +49,21 @@ function Routine({
         console.error(error);
       }
     } else {
+      removeFromProductIds(productId, day);
       setProducts((prev) => {
         prev.delete(p);
         return new Set(prev);
       });
     }
   };
+
+  function removeFromProductIds(id: number, day: boolean) {
+    if (day) {
+      dayProductIds.delete(id);
+    } else {
+      nightProductIds.delete(id);
+    }
+  }
 
   return (
     <div className="flex flex-col items-center">

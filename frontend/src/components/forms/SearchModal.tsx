@@ -24,6 +24,7 @@ import { type RoutineProductType } from "../../types/RoutineProductType";
 import { useAuth } from "../../context/AuthContext";
 import { usePersonalIngredients } from "../../context/PersonalIngredientsContext";
 import { type ProductType } from "../../types/ProductType";
+import { useRoutine } from "../../context/RoutineContext";
 
 function SearchModal({
   day,
@@ -36,8 +37,14 @@ function SearchModal({
   const [searchText, setSearchText] = useState<string>("");
   const [page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
-  const { user, token } = useAuth();
+  const { token } = useAuth();
   const { personalIngredients } = usePersonalIngredients();
+  const {
+    dayProductIds,
+    setDayProductIds,
+    nightProductIds,
+    setNightProductIds,
+  } = useRoutine();
 
   const debounce = useDebounce(searchText, 450);
 
@@ -79,29 +86,33 @@ function SearchModal({
   };
 
   const addProduct = async (p: ProductType) => {
-    if (user) {
-      try {
-        const response: AxiosResponse = await createApi(token || null).post(
-          "api/products/save/",
-          {
-            product: p,
-            day_routine: day,
-            personalIngredients: personalIngredients,
-          },
-          {
-            headers: { "Content-Type": "application/json" },
-            withCredentials: true,
-          },
-        );
+    try {
+      const response: AxiosResponse = await createApi(token || null).post(
+        "api/products/save/",
+        {
+          product: p,
+          day_routine: day,
+          personalIngredients: personalIngredients,
+        },
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        },
+      );
+      console.log(response.data);
+      if (response.status === 200) {
+        if (day) {
+          if (dayProductIds.has(p.id)) return;
 
-        if (response.status === 200) {
-          setRoutineProducts((prev) => new Set([...prev, p]));
+          setDayProductIds((prev) => new Set([...prev, p.id]));
+        } else {
+          if (nightProductIds.has(p.id)) return;
+          setNightProductIds((prev) => new Set([...prev, p.id]));
         }
-      } catch (error: any) {
-        console.error(error);
+        setRoutineProducts((prev) => new Set([...prev, p]));
       }
-    } else {
-      setRoutineProducts((prev) => new Set([...prev, p]));
+    } catch (error: any) {
+      console.error(error);
     }
   };
 

@@ -14,6 +14,10 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
     new Set([]),
   );
   const [hydrated, setHydrated] = useState<boolean>(false);
+  const [dayProductIds, setDayProductIds] = useState<Set<number>>(new Set([]));
+  const [nightProductIds, setNightProductIds] = useState<Set<number>>(
+    new Set([]),
+  );
   const { user, token } = useAuth();
 
   useEffect(() => {
@@ -24,10 +28,17 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
             `api/users/products/${user.id}/`,
           );
 
-          console.log(response);
+          const dayProds: RoutineProductType[] = response.data.dayProducts;
+          const nightProds: RoutineProductType[] = response.data.nightProducts;
+
+          const dayIds = dayProds.map((p) => p.id);
+          const nightIds = nightProds.map((p) => p.id);
+
           if (response.status === 200) {
-            setDayProducts(new Set(response.data.dayProducts));
-            setNightProducts(new Set(response.data.nightProducts));
+            setDayProducts(new Set(dayProds));
+            setNightProducts(new Set(nightProds));
+            setDayProductIds(new Set(dayIds));
+            setNightProductIds(new Set(nightIds));
           }
         } catch (error: any) {
           console.error(error);
@@ -35,10 +46,16 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
       } else {
         const dayProds = localStorage.getItem("dayProducts");
         const nightProds = localStorage.getItem("nightProducts");
+        const dayIds = localStorage.getItem("dayProductIds");
+        const nightIds = localStorage.getItem("nightProductIds");
 
         setDayProducts(dayProds ? new Set(JSON.parse(dayProds)) : new Set([]));
         setNightProducts(
           nightProds ? new Set(JSON.parse(nightProds)) : new Set([]),
+        );
+        setDayProductIds(dayIds ? new Set(JSON.parse(dayIds)) : new Set([]));
+        setNightProductIds(
+          nightIds ? new Set(JSON.parse(nightIds)) : new Set([]),
         );
       }
       setHydrated(true);
@@ -52,11 +69,32 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
 
     localStorage.setItem("dayProducts", JSON.stringify([...dayProducts]));
     localStorage.setItem("nightProducts", JSON.stringify([...nightProducts]));
-  }, [dayProducts, nightProducts, hydrated, user]);
+    localStorage.setItem("dayProductIds", JSON.stringify([...dayProductIds]));
+    localStorage.setItem(
+      "nightProductIds",
+      JSON.stringify([...nightProductIds]),
+    );
+  }, [
+    dayProducts,
+    nightProducts,
+    hydrated,
+    user,
+    dayProductIds,
+    nightProductIds,
+  ]);
 
   return (
     <RoutineContext.Provider
-      value={{ dayProducts, setDayProducts, nightProducts, setNightProducts }}
+      value={{
+        dayProducts,
+        setDayProducts,
+        nightProducts,
+        setNightProducts,
+        setDayProductIds,
+        setNightProductIds,
+        dayProductIds,
+        nightProductIds,
+      }}
     >
       {children}
     </RoutineContext.Provider>
