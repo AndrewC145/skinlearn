@@ -86,6 +86,8 @@ function SearchModal({
   };
 
   const addProduct = async (p: ProductType) => {
+    if (dayProductIds.has(p.id) || nightProductIds.has(p.id)) return;
+
     try {
       const response: AxiosResponse = await createApi(token || null).post(
         "api/products/save/",
