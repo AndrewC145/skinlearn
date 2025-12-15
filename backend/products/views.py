@@ -186,10 +186,3 @@ def save_and_analyze_product(request):
             }
 
             return Response({"analysis": analysis}, status=status.HTTP_200_OK)
-
-
-@api_view(["DELETE"])
-@permission_classes([IsAuthenticated])
-@authentication_classes([JWTAuthentication])
-def delete_user_product(request):
-    pass

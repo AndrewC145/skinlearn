@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, type SetStateAction } from "react";
 import Product from "./Product";
 import EmptyRoutine from "./EmptyRoutine";
@@ -6,6 +7,8 @@ import { PackageSearch } from "lucide-react";
 import { type RoutineProductType } from "../types/RoutineProductType";
 import { Trash2 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import type { AxiosResponse } from "axios";
+import { createApi } from "../api";
 
 function Routine({
   day,
@@ -18,13 +21,30 @@ function Routine({
   products: Set<RoutineProductType>;
   setProducts: React.Dispatch<SetStateAction<Set<RoutineProductType>>>;
 }) {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
 
   const removeProduct = async (p: RoutineProductType) => {
-    setProducts((prev) => {
-      prev.delete(p);
-      return new Set(prev);
-    });
+    if (user) {
+      try {
+        const response: AxiosResponse = await createApi(token).delete(
+          `api/users/products/delete/${user.id}/`,
+          {
+            data: { id: p.id, day },
+            headers: { "Content-Type": "application/json" },
+            withCredentials: true,
+          },
+        );
+
+        if (response.status === 200) {
+          setProducts((prev) => {
+            prev.delete(p);
+            return new Set(prev);
+          });
+        }
+      } catch (error: any) {
+        console.error(error);
+      }
+    }
   };
 
   return (

@@ -12,4 +12,9 @@ urlpatterns = [
         name="add_avoid_ingredients",
     ),
     path("products/<int:pk>/", views.get_user_products, name="get_user_products"),
+    path(
+        "products/delete/<int:pk>/",
+        views.delete_user_product,
+        name="delete_user_product",
+    ),
 ]

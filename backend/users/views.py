@@ -12,6 +12,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .models import User
+from products.models import Products
 from .serializer import (
     RegisterSerializer,
     UserSerializer,
@@ -188,3 +189,28 @@ def get_user_products(request, pk):
             )
         except User.DoesNotExist as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+@authentication_classes([JWTAuthentication])
+def delete_user_product(request, pk):
+    if request.method == "DELETE":
+        user = User.objects.get(pk=pk)
+        day = request.data["day"]
+        product_id = request.data["id"]
+
+        try:
+            if day:
+                product = user.day_products.get(id=product_id)
+                user.day_products.remove(product)
+            else:
+                product = user.night_products.get(id=product_id)
+                user.night_products.remove(product)
+        except Products.DoesNotExist as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"message": "Received"}, status=status.HTTP_200_OK)
+    return Response(
+        {"error": "Invalid request method"}, status=status.HTTP_405_METHOD_NOT_ALLOWED
+    )
