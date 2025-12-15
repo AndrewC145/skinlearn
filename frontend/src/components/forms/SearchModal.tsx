@@ -101,7 +101,6 @@ function SearchModal({
           withCredentials: true,
         },
       );
-      console.log(response.data);
       if (response.status === 200) {
         if (day) {
           if (dayProductIds.has(p.id)) return;
