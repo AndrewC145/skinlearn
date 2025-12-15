@@ -11,39 +11,42 @@ import SubmitPage from "./pages/SubmitPage";
 import Protected from "./components/Protected";
 import Dashboard from "./pages/Dashboard";
 import PersonalIngredientsProvider from "./context/PersonalIngredientsProvider";
+import RoutineProvider from "./context/RoutineProvider";
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <PersonalIngredientsProvider>
-          <Header />
-          <main>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/pore-clogging-checker" element={<Checker />} />
-              <Route path="/routine-builder" element={<Builder />} />
-              <Route
-                path="/submit-product"
-                element={
-                  <Protected>
-                    <SubmitPage />
-                  </Protected>
-                }
-              />
-              <Route
-                path="/dashboard"
-                element={
-                  <Protected superuserOnly>
-                    <Dashboard />
-                  </Protected>
-                }
-              />
-            </Routes>
-          </main>
-          <Footer />
+          <RoutineProvider>
+            <Header />
+            <main>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/pore-clogging-checker" element={<Checker />} />
+                <Route path="/routine-builder" element={<Builder />} />
+                <Route
+                  path="/submit-product"
+                  element={
+                    <Protected>
+                      <SubmitPage />
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <Protected superuserOnly>
+                      <Dashboard />
+                    </Protected>
+                  }
+                />
+              </Routes>
+            </main>
+            <Footer />
+          </RoutineProvider>
         </PersonalIngredientsProvider>
       </AuthProvider>
     </BrowserRouter>

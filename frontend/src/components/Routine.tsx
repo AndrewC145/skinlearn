@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, type SetStateAction } from "react";
+import { type SetStateAction } from "react";
 import Product from "./Product";
 import EmptyRoutine from "./EmptyRoutine";
 import SearchModal from "./forms/SearchModal";
@@ -44,6 +44,11 @@ function Routine({
       } catch (error: any) {
         console.error(error);
       }
+    } else {
+      setProducts((prev) => {
+        prev.delete(p);
+        return new Set(prev);
+      });
     }
   };
 
@@ -55,11 +60,7 @@ function Routine({
           {icon}
           <span>Routine</span>
         </div>
-        <SearchModal
-          day={day}
-          routineProducts={products}
-          setRoutineProducts={setProducts}
-        />
+        <SearchModal day={day} setRoutineProducts={setProducts} />
       </div>
       <div
         className={`mt-8 ${products.size && "grid max-h-[350px] grid-cols-1 gap-4 overflow-y-auto md:grid-cols-2"}`}

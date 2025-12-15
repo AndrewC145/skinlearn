@@ -1,52 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import RoutineTitle from "../components/RoutineTitle";
 import Routine from "../components/Routine";
 import { Sun, Moon } from "lucide-react";
-import { useState, useEffect } from "react";
-import { type RoutineProductType } from "../types/RoutineProductType";
-import type { AxiosResponse } from "axios";
-import { createApi } from "../api";
-import { useAuth } from "../context/AuthContext";
+import { useRoutine } from "../context/RoutineContext";
 
 function Builder() {
-  const [dayProducts, setDayProducts] = useState<Set<RoutineProductType>>(
-    new Set([]),
-  );
-  const [nightProducts, setNightProducts] = useState<Set<RoutineProductType>>(
-    new Set([]),
-  );
-  const { user, token } = useAuth();
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      if (user) {
-        try {
-          const response: AxiosResponse = await createApi(token).get(
-            `api/users/products/${user.id}/`,
-          );
-
-          console.log(response);
-          if (response.status === 200) {
-            setDayProducts(new Set(response.data.dayProducts));
-            setNightProducts(new Set(response.data.nightProducts));
-          }
-        } catch (error: any) {
-          console.error(error);
-        }
-      } else {
-        const dayProds = localStorage.getItem("day_products");
-        const nightProds = localStorage.getItem("night_products");
-
-        if (dayProds === null) {
-          setDayProducts(new Set([]));
-        } else {
-          setDayProducts(JSON.parse(dayProds));
-        }
-      }
-    };
-
-    fetchProducts();
-  }, [token, user]);
+  const { dayProducts, nightProducts, setDayProducts, setNightProducts } =
+    useRoutine();
 
   return (
     <section className="flex min-h-screen items-center justify-center py-8">

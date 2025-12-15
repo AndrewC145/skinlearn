@@ -27,11 +27,9 @@ import { type ProductType } from "../../types/ProductType";
 
 function SearchModal({
   day,
-  routineProducts,
   setRoutineProducts,
 }: {
   day: boolean;
-  routineProducts: Set<RoutineProductType>;
   setRoutineProducts: React.Dispatch<SetStateAction<Set<RoutineProductType>>>;
 }) {
   const [products, setProducts] = useState<ProductType[]>([]);
@@ -81,30 +79,30 @@ function SearchModal({
   };
 
   const addProduct = async (p: ProductType) => {
-    try {
-      const response: AxiosResponse = await createApi(token || null).post(
-        "api/products/save/",
-        {
-          product: p,
-          day_routine: day,
-          personalIngredients: personalIngredients,
-        },
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true,
-        },
-      );
+    if (user) {
+      try {
+        const response: AxiosResponse = await createApi(token || null).post(
+          "api/products/save/",
+          {
+            product: p,
+            day_routine: day,
+            personalIngredients: personalIngredients,
+          },
+          {
+            headers: { "Content-Type": "application/json" },
+            withCredentials: true,
+          },
+        );
 
-      if (response.status === 200) {
-        setRoutineProducts((prev) => new Set([...prev, p]));
+        if (response.status === 200) {
+          setRoutineProducts((prev) => new Set([...prev, p]));
+        }
+      } catch (error: any) {
+        console.error(error);
       }
-      console.log(response);
-    } catch (error: any) {
-      console.error(error);
+    } else {
+      setRoutineProducts((prev) => new Set([...prev, p]));
     }
-
-    if (!user)
-      localStorage.setItem("products", JSON.stringify(routineProducts));
   };
 
   return (
