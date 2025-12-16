@@ -24,10 +24,8 @@ function Routine({
   icon: React.ReactNode;
   products: Set<RoutineProductType>;
   setProducts: React.Dispatch<SetStateAction<Set<RoutineProductType>>>;
-  productInfo?: RoutineInfoType[] | undefined;
-  setProductInfo?: React.Dispatch<
-    SetStateAction<RoutineInfoType[] | undefined>
-  >;
+  productInfo?: RoutineInfoType[];
+  setProductInfo?: React.Dispatch<SetStateAction<RoutineInfoType[]>>;
 }) {
   const { user, token } = useAuth();
   const { dayProductIds, nightProductIds } = useRoutine();
@@ -51,6 +49,14 @@ function Routine({
             prev.delete(p);
             return new Set(prev);
           });
+
+          setProductInfo?.((prev: RoutineInfoType[] | undefined) => {
+            if (prev) {
+              const updatedInfo = prev.filter((info) => info.id !== productId);
+              return updatedInfo;
+            }
+            return prev;
+          });
         }
       } catch (error: any) {
         console.error(error);
@@ -60,6 +66,14 @@ function Routine({
       setProducts((prev) => {
         prev.delete(p);
         return new Set(prev);
+      });
+
+      setProductInfo?.((prev) => {
+        if (prev) {
+          const updatedInfo = prev.filter((info) => info.id !== productId);
+          return updatedInfo;
+        }
+        return prev;
       });
     }
   };

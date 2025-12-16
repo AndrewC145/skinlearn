@@ -34,9 +34,7 @@ function SearchModal({
 }: {
   day: boolean;
   setRoutineProducts: React.Dispatch<SetStateAction<Set<RoutineProductType>>>;
-  setProductInfo?: React.Dispatch<
-    SetStateAction<RoutineInfoType[] | undefined>
-  >;
+  setProductInfo?: React.Dispatch<SetStateAction<RoutineInfoType[]>>;
 }) {
   const [products, setProducts] = useState<ProductType[]>([]);
   const [searchText, setSearchText] = useState<string>("");

@@ -14,13 +14,9 @@ type RoutineContextType = {
   nightProductIds: Set<number>;
   setNightProductIds: React.Dispatch<SetStateAction<Set<number>>>;
   dayProductInfo?: RoutineInfoType[];
-  setDayProductInfo?: React.Dispatch<
-    SetStateAction<RoutineInfoType[] | undefined>
-  >;
+  setDayProductInfo?: React.Dispatch<SetStateAction<RoutineInfoType[]>>;
   nightProductInfo?: RoutineInfoType[];
-  setNightProductInfo?: React.Dispatch<
-    SetStateAction<RoutineInfoType[] | undefined>
-  >;
+  setNightProductInfo?: React.Dispatch<SetStateAction<RoutineInfoType[]>>;
 };
 
 export const RoutineContext = createContext<RoutineContextType>({

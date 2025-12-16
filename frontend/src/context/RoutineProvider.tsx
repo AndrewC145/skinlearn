@@ -19,12 +19,10 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
   const [nightProductIds, setNightProductIds] = useState<Set<number>>(
     new Set([]),
   );
-  const [dayProductInfo, setDayProductInfo] = useState<
-    RoutineInfoType[] | undefined
-  >(undefined);
-  const [nightProductInfo, setNightProductInfo] = useState<
-    RoutineInfoType[] | undefined
-  >(undefined);
+  const [dayProductInfo, setDayProductInfo] = useState<RoutineInfoType[]>([]);
+  const [nightProductInfo, setNightProductInfo] = useState<RoutineInfoType[]>(
+    [],
+  );
   const { user, token } = useAuth();
 
   useEffect(() => {
@@ -55,6 +53,8 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
         const nightProds = localStorage.getItem("nightProducts");
         const dayIds = localStorage.getItem("dayProductIds");
         const nightIds = localStorage.getItem("nightProductIds");
+        const dayInfo = localStorage.getItem("dayProductInfo");
+        const nightInfo = localStorage.getItem("nightProductInfo");
 
         setDayProducts(dayProds ? new Set(JSON.parse(dayProds)) : new Set([]));
         setNightProducts(
@@ -64,6 +64,8 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
         setNightProductIds(
           nightIds ? new Set(JSON.parse(nightIds)) : new Set([]),
         );
+        setDayProductInfo(dayInfo ? JSON.parse(dayInfo) : []);
+        setNightProductInfo(nightInfo ? JSON.parse(nightInfo) : []);
       }
       setHydrated(true);
     };
@@ -81,6 +83,8 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
       "nightProductIds",
       JSON.stringify([...nightProductIds]),
     );
+    localStorage.setItem("dayProductInfo", JSON.stringify(dayProductInfo));
+    localStorage.setItem("nightProductInfo", JSON.stringify(nightProductInfo));
   }, [
     dayProducts,
     nightProducts,
@@ -88,6 +92,8 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
     user,
     dayProductIds,
     nightProductIds,
+    dayProductInfo,
+    nightProductInfo,
   ]);
 
   return (
