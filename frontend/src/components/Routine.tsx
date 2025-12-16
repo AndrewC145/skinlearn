@@ -124,7 +124,7 @@ function Routine({
             {productInfo.map((info: RoutineInfoType, idx: number) => (
               <li key={idx}>
                 <span className="font-bold">{info.name}:</span>{" "}
-                <span className="inline-block rounded bg-red-100 px-2 py-0.5">
+                <span className="inline-block rounded bg-red-100 px-2 py-0.5 capitalize">
                   {info.comedogenic_ingredients.join(", ")}
                 </span>
               </li>
