@@ -10,17 +10,24 @@ import { useAuth } from "../context/AuthContext";
 import type { AxiosResponse } from "axios";
 import { createApi } from "../api";
 import { useRoutine } from "../context/RoutineContext";
+import { type RoutineInfoType } from "../types/RoutineInfoType";
 
 function Routine({
   day,
   icon,
   products,
   setProducts,
+  productInfo,
+  setProductInfo,
 }: {
   day: boolean;
   icon: React.ReactNode;
   products: Set<RoutineProductType>;
   setProducts: React.Dispatch<SetStateAction<Set<RoutineProductType>>>;
+  productInfo?: RoutineInfoType[] | undefined;
+  setProductInfo?: React.Dispatch<
+    SetStateAction<RoutineInfoType[] | undefined>
+  >;
 }) {
   const { user, token } = useAuth();
   const { dayProductIds, nightProductIds } = useRoutine();
@@ -73,8 +80,44 @@ function Routine({
           {icon}
           <span>Routine</span>
         </div>
-        <SearchModal day={day} setRoutineProducts={setProducts} />
+        <SearchModal
+          day={day}
+          setRoutineProducts={setProducts}
+          setProductInfo={setProductInfo}
+        />
       </div>
+      {productInfo && productInfo.length > 0 && (
+        <div className="mt-4 w-full max-w-md rounded-lg border border-red-300 bg-red-50 p-4 text-center shadow">
+          <div className="mb-2 flex items-center justify-center text-red-700">
+            <svg
+              className="mr-2 h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <h3 className="font-semibold">
+              Comedogenic or Personalized Ingredients found:
+            </h3>
+          </div>
+          <ul className="space-y-1 text-sm text-red-800">
+            {productInfo.map((info: RoutineInfoType, idx: number) => (
+              <li key={idx}>
+                <span className="font-bold">{info.name}:</span>{" "}
+                <span className="inline-block rounded bg-red-100 px-2 py-0.5">
+                  {info.comedogenic_ingredients}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       <div
         className={`mt-8 ${products.size && "grid max-h-[350px] grid-cols-1 gap-4 overflow-y-auto md:grid-cols-2"}`}
       >

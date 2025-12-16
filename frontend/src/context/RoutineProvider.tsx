@@ -5,6 +5,7 @@ import { type RoutineProductType } from "../types/RoutineProductType";
 import { useAuth } from "./AuthContext";
 import { type AxiosResponse } from "axios";
 import { createApi } from "../api";
+import { type RoutineInfoType } from "../types/RoutineInfoType";
 
 function RoutineProvider({ children }: { children: React.ReactNode }) {
   const [dayProducts, setDayProducts] = useState<Set<RoutineProductType>>(
@@ -18,6 +19,12 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
   const [nightProductIds, setNightProductIds] = useState<Set<number>>(
     new Set([]),
   );
+  const [dayProductInfo, setDayProductInfo] = useState<
+    RoutineInfoType[] | undefined
+  >(undefined);
+  const [nightProductInfo, setNightProductInfo] = useState<
+    RoutineInfoType[] | undefined
+  >(undefined);
   const { user, token } = useAuth();
 
   useEffect(() => {
@@ -94,6 +101,10 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
         setNightProductIds,
         dayProductIds,
         nightProductIds,
+        dayProductInfo,
+        setDayProductInfo,
+        nightProductInfo,
+        setNightProductInfo,
       }}
     >
       {children}

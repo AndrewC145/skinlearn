@@ -25,13 +25,18 @@ import { useAuth } from "../../context/AuthContext";
 import { usePersonalIngredients } from "../../context/PersonalIngredientsContext";
 import { type ProductType } from "../../types/ProductType";
 import { useRoutine } from "../../context/RoutineContext";
+import { type RoutineInfoType } from "../../types/RoutineInfoType";
 
 function SearchModal({
   day,
   setRoutineProducts,
+  setProductInfo,
 }: {
   day: boolean;
   setRoutineProducts: React.Dispatch<SetStateAction<Set<RoutineProductType>>>;
+  setProductInfo?: React.Dispatch<
+    SetStateAction<RoutineInfoType[] | undefined>
+  >;
 }) {
   const [products, setProducts] = useState<ProductType[]>([]);
   const [searchText, setSearchText] = useState<string>("");
@@ -101,13 +106,27 @@ function SearchModal({
           withCredentials: true,
         },
       );
+      console.log(response.data);
       if (response.status === 200) {
-        if (day) {
-          if (dayProductIds.has(p.id)) return;
+        const analysis = response.data.analysis;
+        if (analysis.comedogenic_ingredients.length > 0) {
+          const routineInfo: RoutineInfoType = {
+            id: p.id,
+            name: p.name,
+            brand: p.brand,
+            comedogenic_ingredients: analysis.comedogenic_ingredients,
+          };
 
+          setProductInfo?.((prev) => {
+            if (prev) {
+              return [...prev, routineInfo];
+            }
+            return [routineInfo];
+          });
+        }
+        if (day) {
           setDayProductIds((prev) => new Set([...prev, p.id]));
         } else {
-          if (nightProductIds.has(p.id)) return;
           setNightProductIds((prev) => new Set([...prev, p.id]));
         }
         setRoutineProducts((prev) => new Set([...prev, p]));
