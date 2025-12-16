@@ -50,7 +50,7 @@ function Routine({
             return new Set(prev);
           });
 
-          setProductInfo?.((prev: RoutineInfoType[] | undefined) => {
+          setProductInfo?.((prev: RoutineInfoType[]) => {
             if (prev) {
               const updatedInfo = prev.filter((info) => info.id !== productId);
               return updatedInfo;
@@ -125,7 +125,7 @@ function Routine({
               <li key={idx}>
                 <span className="font-bold">{info.name}:</span>{" "}
                 <span className="inline-block rounded bg-red-100 px-2 py-0.5">
-                  {info.comedogenic_ingredients}
+                  {info.comedogenic_ingredients.join(", ")}
                 </span>
               </li>
             ))}
