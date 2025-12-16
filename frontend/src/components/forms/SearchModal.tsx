@@ -104,14 +104,12 @@ function SearchModal({
           withCredentials: true,
         },
       );
-      console.log(response.data);
       if (response.status === 200) {
         const analysis = response.data.analysis;
         if (analysis.comedogenic_ingredients.length > 0) {
           const routineInfo: RoutineInfoType = {
             id: p.id,
             name: p.name,
-            brand: p.brand,
             comedogenic_ingredients: analysis.comedogenic_ingredients,
           };
 

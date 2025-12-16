@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import { useEffect, useState, type SetStateAction } from "react";
 import { RoutineContext } from "./RoutineContext";
 import { type RoutineProductType } from "../types/RoutineProductType";
 import { useAuth } from "./AuthContext";
 import { type AxiosResponse } from "axios";
 import { createApi } from "../api";
 import { type RoutineInfoType } from "../types/RoutineInfoType";
+import { usePersonalIngredients } from "./PersonalIngredientsContext";
 
 function RoutineProvider({ children }: { children: React.ReactNode }) {
   const [dayProducts, setDayProducts] = useState<Set<RoutineProductType>>(
@@ -24,6 +25,7 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
     [],
   );
   const { user, token } = useAuth();
+  const { personalIngredients } = usePersonalIngredients();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -44,6 +46,11 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
             setNightProducts(new Set(nightProds));
             setDayProductIds(new Set(dayIds));
             setNightProductIds(new Set(nightIds));
+
+            await Promise.all([
+              analyzeRoutine(dayProds, true, setDayProductInfo),
+              analyzeRoutine(nightProds, false, setNightProductInfo),
+            ]);
           }
         } catch (error: any) {
           console.error(error);
@@ -95,6 +102,47 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
     dayProductInfo,
     nightProductInfo,
   ]);
+
+  const analyzeRoutine = async (
+    products: RoutineProductType[],
+    day: boolean,
+    setInfo: React.Dispatch<SetStateAction<RoutineInfoType[]>>,
+  ) => {
+    const infos: RoutineInfoType[] = [];
+    await Promise.all(
+      products.map(async (product: RoutineProductType) => {
+        try {
+          const response: AxiosResponse = await createApi(token).post(
+            "api/products/save/",
+            {
+              product: product,
+              day_routine: day,
+              personalIngredients: personalIngredients,
+            },
+            {
+              headers: { "Content-Type": "application/json" },
+              withCredentials: true,
+            },
+          );
+
+          if (response.status === 200) {
+            const analysis = response.data.analysis;
+            if (analysis.comedogenic_ingredients.length > 0) {
+              infos.push({
+                id: product.id,
+                name: product.name,
+                comedogenic_ingredients: analysis.comedogenic_ingredients,
+              });
+            }
+          }
+        } catch (error: any) {
+          console.error(error);
+        }
+      }),
+    );
+
+    setInfo(infos);
+  };
 
   return (
     <RoutineContext.Provider

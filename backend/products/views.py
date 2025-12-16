@@ -167,9 +167,15 @@ def save_and_analyze_product(request):
                 )
 
             if request.user.is_authenticated:
-                if day_routine:
+                if (
+                    day_routine
+                    and not request.user.day_products.filter(id=product_id).exists()
+                ):
                     request.user.day_products.add(product)
-                else:
+                elif (
+                    not day_routine
+                    and not request.user.night_products.filter(id=product_id).exists()
+                ):
                     request.user.night_products.add(product)
                 avoid_ing = request.user.avoid_ingredients
             else:
@@ -181,8 +187,12 @@ def save_and_analyze_product(request):
             analysis = {
                 "id": product.id,
                 "name": product.name,
-                "brand": product.brand,
                 "comedogenic_ingredients": comedogenic_ingredients,
             }
 
             return Response({"analysis": analysis}, status=status.HTTP_200_OK)
+    else:
+        return Response(
+            {"error": "Invalid request method"},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED,
+        )
