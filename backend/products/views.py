@@ -19,6 +19,7 @@ import re
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
 from ingredients.views import handle_ingredients_check
+from ingredients.models import Ingredients
 
 
 # Create your views here.
@@ -196,3 +197,53 @@ def save_and_analyze_product(request):
             {"error": "Invalid request method"},
             status=status.HTTP_405_METHOD_NOT_ALLOWED,
         )
+
+
+def check_routine_compatibility(products):
+    all_ings = set()
+    for product in products:
+        all_ings.update([ing.lower() for ing in product.raw_ingredients])
+
+    ingredients = Ingredients.objects.filter(name__in=all_ings)
+    categories = ["AHA", "BHA", "retinol", "vitamin c", "acne treatment"]
+    category_mapping = {category: [] for category in categories}
+
+    present_ings = set()
+    for ing in ingredients:
+        present_ings.add(ing.name)
+        if ing.category in category_mapping:
+            category_mapping[ing.category].append(ing.name)
+
+    present_cats = {cat for cat, ings in categories.items() if ings}
+    all_present = present_cats.union(present_ings)
+
+    bad_mixes = [
+        frozenset(["AHA", "BHA"]),
+        frozenset(["AHA", "retinol"]),
+        frozenset(["BHA", "retinol"]),
+        frozenset(["vitamin c", "retinol"]),
+        frozenset(["vitamin c", "AHA"]),
+        frozenset(["vitamin c", "BHA"]),
+        frozenset(["niacinamide", "vitamin c"]),
+    ]
+
+    bad_combos = []
+
+    for mix in bad_mixes:
+        if mix.issubset(all_present):
+            involved = {}
+            for item in mix:
+                if item in category_mapping:
+                    involved[item] = category_mapping[item]
+                elif item in present_ings:
+                    involved[item] = [item]
+            bad_combos.append(
+                {
+                    "combination": list(mix),
+                    "involved_ingredients": involved,
+                }
+            )
+
+    print("Bad combos found:", bad_combos)
+
+    return bad_combos

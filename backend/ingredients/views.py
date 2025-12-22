@@ -78,6 +78,57 @@ def handle_ingredients_check(ingredients, avoid_ing):
     return comedogenic_ingredients
 
 
+def check_compatibility(ingredient_list):
+    categories = ["AHA", "BHA", "retinol", "vitamin c", "acne treatment"]
+
+    category_mapping = {category: [] for category in categories}
+    compatibilities = (
+        Ingredients.objects.filter(name__in=ingredient_list)
+        .filter(category__in=categories)
+        .values_list("name", "category")
+    )
+
+    for name, category in compatibilities:
+        if category in category_mapping:
+            category_mapping[category].append(name)
+
+    bad_combos = [
+        frozenset(["AHA", "BHA"]),
+        frozenset(["AHA", "retinol"]),
+        frozenset(["BHA", "retinol"]),
+        frozenset(["vitamin c", "retinol"]),
+        frozenset(["vitamin c", "AHA"]),
+        frozenset(["vitamin c", "BHA"]),
+        frozenset(["niacinamide", "vitamin c"]),
+    ]
+
+    present_categories = {cat for cat, ings in category_mapping.items() if ings}
+    present_ingredients = set([name.lower() for name in ingredient_list])
+
+    bad_mixes = []
+    all_present = present_categories.union(present_ingredients)
+
+    for combo in bad_combos:
+        if combo.issubset(all_present):
+            involved = {}
+            for item in combo:
+                if item in category_mapping:
+                    involved[item] = category_mapping[item]
+                elif item in present_ingredients:
+                    involved[item] = [item]
+            bad_mixes.append(
+                {
+                    "categories": list(combo),
+                    "ingredients": involved,
+                }
+            )
+
+    if bad_mixes:
+        logging.warning(f"Detected incompatible ingredient combinations: {bad_mixes}")
+
+    return bad_mixes
+
+
 @api_view(["GET"])
 @permission_classes([])
 def get_all_ingredients(request: any):
