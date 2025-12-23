@@ -13,6 +13,8 @@ function Builder() {
     setDayProductInfo,
     nightProductInfo,
     setNightProductInfo,
+    dayRoutineIssues,
+    nightRoutineIssues,
   } = useRoutine();
 
   return (
@@ -26,6 +28,7 @@ function Builder() {
             setProducts={setDayProducts}
             productInfo={dayProductInfo}
             setProductInfo={setDayProductInfo}
+            routineIssues={dayRoutineIssues}
             icon={<Sun />}
           />
           <Routine
@@ -34,6 +37,7 @@ function Builder() {
             setProducts={setNightProducts}
             productInfo={nightProductInfo}
             setProductInfo={setNightProductInfo}
+            routineIssues={nightRoutineIssues}
             icon={<Moon />}
           />
         </div>

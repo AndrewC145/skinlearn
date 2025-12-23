@@ -18,10 +18,10 @@ type RoutineContextType = {
   setDayProductInfo?: React.Dispatch<SetStateAction<RoutineInfoType[]>>;
   nightProductInfo?: RoutineInfoType[];
   setNightProductInfo?: React.Dispatch<SetStateAction<RoutineInfoType[]>>;
-  dayRoutineIssues?: BadComboType[];
-  nightRoutineIssues?: BadComboType[];
-  setDayRoutineIssues?: React.Dispatch<SetStateAction<BadComboType[]>>;
-  setNightRoutineIssues?: React.Dispatch<SetStateAction<BadComboType[]>>;
+  dayRoutineIssues?: Set<BadComboType>;
+  nightRoutineIssues?: Set<BadComboType>;
+  setDayRoutineIssues?: React.Dispatch<SetStateAction<Set<BadComboType>>>;
+  setNightRoutineIssues?: React.Dispatch<SetStateAction<Set<BadComboType>>>;
 };
 
 export const RoutineContext = createContext<RoutineContextType>({

@@ -25,10 +25,12 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
   const [nightProductInfo, setNightProductInfo] = useState<RoutineInfoType[]>(
     [],
   );
-  const [dayRoutineIssues, setDayRoutineIssues] = useState<BadComboType[]>([]);
-  const [nightRoutineIssues, setNightRoutineIssues] = useState<BadComboType[]>(
-    [],
+  const [dayRoutineIssues, setDayRoutineIssues] = useState<Set<BadComboType>>(
+    new Set([]),
   );
+  const [nightRoutineIssues, setNightRoutineIssues] = useState<
+    Set<BadComboType>
+  >(new Set([]));
   const { user, token } = useAuth();
   const { personalIngredients } = usePersonalIngredients();
 
@@ -122,10 +124,10 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
     products: RoutineProductType[],
     day: boolean,
     setInfo: React.Dispatch<SetStateAction<RoutineInfoType[]>>,
-    setIssues: React.Dispatch<SetStateAction<BadComboType[]>>,
+    setIssues: React.Dispatch<SetStateAction<Set<BadComboType>>>,
   ) => {
     const infos: RoutineInfoType[] = [];
-    const issues: BadComboType[] = [];
+    const issues = new Set();
     await Promise.all(
       products.map(async (product: RoutineProductType) => {
         try {
@@ -160,11 +162,18 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
               const productsInvolved: string[] =
                 routineIssues.products_involved;
 
-              issues.push({
-                combination: badCombos,
-                productNames: productsInvolved,
-                involved_ingredients: routineIssues.involved_ingredients,
-              });
+              const identifier = badCombos.sort().join("-");
+              if (!issues.has(identifier)) {
+                issues.add(identifier);
+                setIssues((prev) => {
+                  const newSet = new Set(prev);
+                  newSet.add({
+                    combination: badCombos,
+                    productNames: productsInvolved,
+                  });
+                  return newSet;
+                });
+              }
             }
           }
         } catch (error: any) {
@@ -174,7 +183,6 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
     );
 
     setInfo(infos);
-    setIssues(issues);
   };
 
   return (

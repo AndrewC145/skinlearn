@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { type SetStateAction } from "react";
+import { type SetStateAction, useEffect } from "react";
 import Product from "./Product";
 import EmptyRoutine from "./EmptyRoutine";
 import SearchModal from "./forms/SearchModal";
@@ -11,6 +11,7 @@ import type { AxiosResponse } from "axios";
 import { createApi } from "../api";
 import { useRoutine } from "../context/RoutineContext";
 import { type RoutineInfoType } from "../types/RoutineInfoType";
+import { type BadComboType } from "../types/BadComboType";
 
 function Routine({
   day,
@@ -19,6 +20,7 @@ function Routine({
   setProducts,
   productInfo,
   setProductInfo,
+  routineIssues,
 }: {
   day: boolean;
   icon: React.ReactNode;
@@ -26,9 +28,14 @@ function Routine({
   setProducts: React.Dispatch<SetStateAction<Set<RoutineProductType>>>;
   productInfo?: RoutineInfoType[];
   setProductInfo?: React.Dispatch<SetStateAction<RoutineInfoType[]>>;
+  routineIssues?: Set<BadComboType>;
 }) {
   const { user, token } = useAuth();
   const { dayProductIds, nightProductIds } = useRoutine();
+
+  useEffect(() => {
+    console.log("Routine Issues:", routineIssues);
+  }, [routineIssues]);
 
   const removeProduct = async (p: RoutineProductType) => {
     const productId = p.id;

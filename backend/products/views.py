@@ -257,7 +257,6 @@ def check_routine_compatibility(products):
                 }
             )
     product_names = check_compatibility_products(products, bad_combos)
-    print(product_names)
     return {"bad_combinations": bad_combos, "products_involved": product_names}
 
 
