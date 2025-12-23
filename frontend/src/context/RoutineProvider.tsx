@@ -6,6 +6,7 @@ import { useAuth } from "./AuthContext";
 import { type AxiosResponse } from "axios";
 import { createApi } from "../api";
 import { type RoutineInfoType } from "../types/RoutineInfoType";
+import { type BadComboType } from "../types/BadComboType";
 import { usePersonalIngredients } from "./PersonalIngredientsContext";
 
 function RoutineProvider({ children }: { children: React.ReactNode }) {
@@ -22,6 +23,10 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
   );
   const [dayProductInfo, setDayProductInfo] = useState<RoutineInfoType[]>([]);
   const [nightProductInfo, setNightProductInfo] = useState<RoutineInfoType[]>(
+    [],
+  );
+  const [dayRoutineIssues, setDayRoutineIssues] = useState<BadComboType[]>([]);
+  const [nightRoutineIssues, setNightRoutineIssues] = useState<BadComboType[]>(
     [],
   );
   const { user, token } = useAuth();
@@ -48,8 +53,18 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
             setNightProductIds(new Set(nightIds));
 
             await Promise.all([
-              analyzeRoutine(dayProds, true, setDayProductInfo),
-              analyzeRoutine(nightProds, false, setNightProductInfo),
+              analyzeRoutine(
+                dayProds,
+                true,
+                setDayProductInfo,
+                setDayRoutineIssues,
+              ),
+              analyzeRoutine(
+                nightProds,
+                false,
+                setNightProductInfo,
+                setNightRoutineIssues,
+              ),
             ]);
           }
         } catch (error: any) {
@@ -107,8 +122,10 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
     products: RoutineProductType[],
     day: boolean,
     setInfo: React.Dispatch<SetStateAction<RoutineInfoType[]>>,
+    setIssues: React.Dispatch<SetStateAction<BadComboType[]>>,
   ) => {
     const infos: RoutineInfoType[] = [];
+    const issues: BadComboType[] = [];
     await Promise.all(
       products.map(async (product: RoutineProductType) => {
         try {
@@ -125,13 +142,28 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
             },
           );
 
+          console.log(response);
+
           if (response.status === 200) {
             const analysis = response.data.analysis;
+            const routineIssues = response.data.routineIssues;
             if (analysis.comedogenic_ingredients.length > 0) {
               infos.push({
                 id: product.id,
                 name: product.name,
                 comedogenic_ingredients: analysis.comedogenic_ingredients,
+              });
+            }
+
+            if (routineIssues) {
+              const badCombos = routineIssues.bad_combinations;
+              const productsInvolved: string[] =
+                routineIssues.products_involved;
+
+              issues.push({
+                combination: badCombos,
+                productNames: productsInvolved,
+                involved_ingredients: routineIssues.involved_ingredients,
               });
             }
           }
@@ -142,6 +174,7 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
     );
 
     setInfo(infos);
+    setIssues(issues);
   };
 
   return (
@@ -159,6 +192,8 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
         setDayProductInfo,
         nightProductInfo,
         setNightProductInfo,
+        dayRoutineIssues,
+        nightRoutineIssues,
       }}
     >
       {children}

@@ -168,6 +168,7 @@ def save_and_analyze_product(request):
                 )
 
             if request.user.is_authenticated:
+
                 if (
                     day_routine
                     and not request.user.day_products.filter(id=product_id).exists()
@@ -179,6 +180,9 @@ def save_and_analyze_product(request):
                 ):
                     request.user.night_products.add(product)
                 avoid_ing = request.user.avoid_ingredients
+                all_products = (
+                    request.user.day_products.all() | request.user.night_products.all()
+                )
             else:
                 avoid_ing = request.data.get("personalIngredients", [])
 
@@ -191,7 +195,16 @@ def save_and_analyze_product(request):
                 "comedogenic_ingredients": comedogenic_ingredients,
             }
 
-            return Response({"analysis": analysis}, status=status.HTTP_200_OK)
+            routine_issues = (
+                check_routine_compatibility(all_products)
+                if request.user.is_authenticated
+                else []
+            )
+
+            return Response(
+                {"analysis": analysis, "routineIssues": routine_issues},
+                status=status.HTTP_200_OK,
+            )
     else:
         return Response(
             {"error": "Invalid request method"},
@@ -214,7 +227,7 @@ def check_routine_compatibility(products):
         if ing.category in category_mapping:
             category_mapping[ing.category].append(ing.name)
 
-    present_cats = {cat for cat, ings in categories.items() if ings}
+    present_cats = {cat for cat, ings in category_mapping.items() if ings}
     all_present = present_cats.union(present_ings)
 
     bad_mixes = [
@@ -243,7 +256,26 @@ def check_routine_compatibility(products):
                     "involved_ingredients": involved,
                 }
             )
+    product_names = check_compatibility_products(products, bad_combos)
+    print(product_names)
+    return {"bad_combinations": bad_combos, "products_involved": product_names}
 
-    print("Bad combos found:", bad_combos)
 
-    return bad_combos
+def check_compatibility_products(products, bad_combos):
+    product_names = set()
+    product_mapping = {
+        product.name: {ing.lower() for ing in product.raw_ingredients}
+        for product in products
+    }
+
+    for combo in bad_combos:
+        involved_ings = combo["involved_ingredients"]
+        combined_ings = set()
+        for ings in involved_ings.values():
+            combined_ings.update(ings)
+
+        for product_name, ingredients in product_mapping.items():
+            if ingredients.intersection(combined_ings):
+                product_names.add(product_name)
+
+    return list(product_names)

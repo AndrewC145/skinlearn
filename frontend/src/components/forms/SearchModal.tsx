@@ -109,6 +109,8 @@ function SearchModal({
           withCredentials: true,
         },
       );
+
+      console.log(response);
       if (response.status === 200) {
         const analysis = response.data.analysis;
         if (analysis.comedogenic_ingredients.length > 0) {

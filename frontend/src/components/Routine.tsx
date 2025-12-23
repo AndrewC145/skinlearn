@@ -100,6 +100,37 @@ function Routine({
           setProductInfo={setProductInfo}
         />
       </div>
+      <RoutineAlert productInfo={productInfo} />
+      <div
+        className={`mt-8 ${products.size && "grid max-h-[350px] grid-cols-1 gap-4 overflow-y-auto md:grid-cols-2"}`}
+      >
+        {!products.size ? (
+          <EmptyRoutine
+            icon={<PackageSearch />}
+            title="No Products Yet"
+            description="You haven't added any projects yet for this routine. Get started
+          by adding your first product."
+          />
+        ) : (
+          Array.from(products).map((p: RoutineProductType, index: number) => (
+            <Product
+              key={index}
+              productName={p.name}
+              image={p.image}
+              tag={p.category}
+              icon={<Trash2 />}
+              onClick={() => removeProduct(p)}
+            />
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
+function RoutineAlert({ productInfo }: { productInfo?: RoutineInfoType[] }) {
+  return (
+    <>
       {productInfo && productInfo.length > 0 && (
         <div className="mt-4 w-full max-w-md rounded-lg border border-red-300 bg-red-50 p-4 text-center shadow">
           <div className="mb-2 flex items-center justify-center text-red-700">
@@ -132,30 +163,7 @@ function Routine({
           </ul>
         </div>
       )}
-      <div
-        className={`mt-8 ${products.size && "grid max-h-[350px] grid-cols-1 gap-4 overflow-y-auto md:grid-cols-2"}`}
-      >
-        {!products.size ? (
-          <EmptyRoutine
-            icon={<PackageSearch />}
-            title="No Products Yet"
-            description="You haven't added any projects yet for this routine. Get started
-          by adding your first product."
-          />
-        ) : (
-          Array.from(products).map((p: RoutineProductType, index: number) => (
-            <Product
-              key={index}
-              productName={p.name}
-              image={p.image}
-              tag={p.category}
-              icon={<Trash2 />}
-              onClick={() => removeProduct(p)}
-            />
-          ))
-        )}
-      </div>
-    </div>
+    </>
   );
 }
 

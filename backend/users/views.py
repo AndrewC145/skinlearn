@@ -19,6 +19,7 @@ from .serializer import (
     CustomTokenObtainPairSerializer,
     AvoidIngredientsSerializer,
 )
+from products.views import check_routine_compatibility
 from products.serializer import SimpleProductSerializer
 from django.contrib.auth import get_user_model
 from rest_framework.throttling import AnonRateThrottle
@@ -209,8 +210,13 @@ def delete_user_product(request, pk):
                 user.night_products.remove(product)
         except Products.DoesNotExist as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        all_products = user.day_products.all() | user.night_products.all()
+        routine_issues = check_routine_compatibility(all_products)
 
-        return Response({"message": "Received"}, status=status.HTTP_200_OK)
+        return Response(
+            {"routineIssues": routine_issues},
+            status=status.HTTP_200_OK,
+        )
     return Response(
         {"error": "Invalid request method"}, status=status.HTTP_405_METHOD_NOT_ALLOWED
     )

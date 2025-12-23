@@ -1,6 +1,7 @@
 import { useContext, createContext, type SetStateAction } from "react";
 import { type RoutineProductType } from "../types/RoutineProductType";
 import { type RoutineInfoType } from "../types/RoutineInfoType";
+import { type BadComboType } from "../types/BadComboType";
 
 type RoutineContextType = {
   dayProducts: Set<RoutineProductType>;
@@ -17,6 +18,10 @@ type RoutineContextType = {
   setDayProductInfo?: React.Dispatch<SetStateAction<RoutineInfoType[]>>;
   nightProductInfo?: RoutineInfoType[];
   setNightProductInfo?: React.Dispatch<SetStateAction<RoutineInfoType[]>>;
+  dayRoutineIssues?: BadComboType[];
+  nightRoutineIssues?: BadComboType[];
+  setDayRoutineIssues?: React.Dispatch<SetStateAction<BadComboType[]>>;
+  setNightRoutineIssues?: React.Dispatch<SetStateAction<BadComboType[]>>;
 };
 
 export const RoutineContext = createContext<RoutineContextType>({
@@ -34,6 +39,10 @@ export const RoutineContext = createContext<RoutineContextType>({
   setDayProductInfo: () => {},
   nightProductInfo: undefined,
   setNightProductInfo: () => {},
+  dayRoutineIssues: undefined,
+  nightRoutineIssues: undefined,
+  setDayRoutineIssues: () => {},
+  setNightRoutineIssues: () => {},
 });
 
 export const useRoutine = () => {
