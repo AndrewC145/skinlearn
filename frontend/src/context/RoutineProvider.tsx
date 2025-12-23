@@ -31,6 +31,7 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
   const [nightRoutineIssues, setNightRoutineIssues] = useState<
     Set<BadComboType>
   >(new Set([]));
+  const [identifiers, setIdentifiers] = useState<Set<string[]>>(new Set([]));
   const { user, token } = useAuth();
   const { personalIngredients } = usePersonalIngredients();
 
@@ -41,6 +42,8 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
           const response: AxiosResponse = await createApi(token).get(
             `api/users/products/${user.id}/`,
           );
+
+          console.log(response);
 
           const dayProds: RoutineProductType[] = response.data.dayProducts;
           const nightProds: RoutineProductType[] = response.data.nightProducts;
@@ -127,7 +130,8 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
     setIssues: React.Dispatch<SetStateAction<Set<BadComboType>>>,
   ) => {
     const infos: RoutineInfoType[] = [];
-    const issues = new Set();
+    const issues: { [identifier: string]: BadComboType } = {};
+    const identifiers = new Set<string[]>();
     await Promise.all(
       products.map(async (product: RoutineProductType) => {
         try {
@@ -161,18 +165,12 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
               const badCombos = routineIssues.bad_combinations;
               const productsInvolved: string[] =
                 routineIssues.products_involved;
-
-              const identifier = badCombos.sort().join("-");
-              if (!issues.has(identifier)) {
-                issues.add(identifier);
-                setIssues((prev) => {
-                  const newSet = new Set(prev);
-                  newSet.add({
-                    combination: badCombos,
-                    productNames: productsInvolved,
-                  });
-                  return newSet;
-                });
+              if (!issues[badCombos.identifier]) {
+                issues[badCombos.identifier] = {
+                  combination: badCombos,
+                  productNames: productsInvolved,
+                  identifier: badCombos.identifier,
+                };
               }
             }
           }
@@ -183,6 +181,8 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
     );
 
     setInfo(infos);
+    setIdentifiers(identifiers);
+    setIssues(new Set(Object.values(issues)));
   };
 
   return (

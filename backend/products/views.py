@@ -250,8 +250,10 @@ def check_routine_compatibility(products):
                     involved[item] = category_mapping[item]
                 elif item in present_ings:
                     involved[item] = [item]
+
             bad_combos.append(
                 {
+                    "identifier": "-".join(sorted(list(mix))),
                     "combination": list(mix),
                     "involved_ingredients": involved,
                 }

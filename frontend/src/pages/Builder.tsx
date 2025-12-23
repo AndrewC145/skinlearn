@@ -18,7 +18,7 @@ function Builder() {
   } = useRoutine();
 
   return (
-    <section className="flex min-h-screen items-center justify-center py-8">
+    <section className="flex min-h-screen items-center justify-center py-20">
       <div className="flex flex-col gap-20">
         <RoutineTitle />
         <div className="flex justify-between gap-8 px-8">
