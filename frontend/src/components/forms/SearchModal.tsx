@@ -115,7 +115,6 @@ function SearchModal({
         },
       );
 
-      console.log(response);
       if (response.status === 200) {
         const analysis = response.data.analysis;
         if (analysis.comedogenic_ingredients.length > 0) {
@@ -133,14 +132,17 @@ function SearchModal({
         }
 
         const routineIssues = response.data.routineIssues;
-        if (routineIssues?.bad_combinations) {
-          const combo = routineIssues.bad_combinations;
-          setRoutineIssues((prev) => ({
-            ...prev,
-            [combo.identifier]: {
-              combination: combo,
-            },
-          }));
+        if (routineIssues.bad_combinations.length > 0) {
+          for (const combo of routineIssues.bad_combinations) {
+            setRoutineIssues((prev) => {
+              return {
+                ...prev,
+                [combo.identifier]: {
+                  combination: combo,
+                },
+              };
+            });
+          }
         }
         if (day) {
           setDayProductIds((prev) => new Set([...prev, p.id]));

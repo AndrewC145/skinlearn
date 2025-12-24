@@ -186,26 +186,25 @@ function RoutineIssueAlert({
   routineIssues?: Record<string, BadComboType>;
 }) {
   if (!routineIssues || Object.keys(routineIssues).length === 0) return null;
-  console.log(routineIssues);
   return (
     <div className="mt-4 w-full max-w-md rounded-lg border border-red-300 bg-red-50 p-4 text-center shadow">
       <InnerRoutineAlert text="Conflicting Ingredients Found:" />
       <ul className="space-y-1 text-sm text-red-800">
-        {Object.values(routineIssues).map((issue: any, idx: number) => (
-          <li key={idx}>
-            <span>
-              {issue.combination.map((obj: any) => (
-                <div key={obj.identifier} className="mb-1">
-                  <span className="font-bold capitalize">
-                    {obj.combination.join(" + ")}{" "}
-                  </span>
-                  {"in "}
-                  <span>{obj.productsInvolved.join(", ")} </span>
-                </div>
-              ))}
-            </span>
-          </li>
-        ))}
+        {Object.values(routineIssues).map((issue: any, idx: number) => {
+          const combo = issue.combination;
+
+          return (
+            <li key={combo.identifier ?? idx}>
+              <div className="mb-1">
+                <span className="font-bold capitalize">
+                  {combo.combination.join(" + ")}{" "}
+                </span>
+                {" in "}
+                <span>{combo.productsInvolved.join(", ")}</span>
+              </div>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

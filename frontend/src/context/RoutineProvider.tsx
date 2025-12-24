@@ -156,13 +156,13 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
               });
             }
 
-            if (routineIssues) {
-              const badCombos = routineIssues.bad_combinations;
-
-              if (!issues[badCombos.identifier]) {
-                issues[badCombos.identifier] = {
-                  combination: badCombos,
-                };
+            if (routineIssues?.bad_combinations.length > 0) {
+              for (const combo of routineIssues.bad_combinations) {
+                if (!issues[combo.identifier]) {
+                  issues[combo.identifier] = {
+                    combination: combo,
+                  };
+                }
               }
             }
           }
