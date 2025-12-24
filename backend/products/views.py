@@ -258,8 +258,10 @@ def check_routine_compatibility(products):
                     "involved_ingredients": involved,
                 }
             )
-    product_names = check_compatibility_products(products, bad_combos)
-    return {"bad_combinations": bad_combos, "products_involved": product_names}
+            product_names = check_compatibility_products(products, bad_combos)
+            bad_combos[-1]["productsInvolved"] = product_names
+
+    return {"bad_combinations": bad_combos}
 
 
 def check_compatibility_products(products, bad_combos):

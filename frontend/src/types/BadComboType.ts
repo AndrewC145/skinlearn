@@ -1,5 +1,8 @@
 export type BadComboType = {
-  identifier?: string;
-  combination: string[];
-  productNames?: string[];
+  combination: {
+    identifier: string;
+    combination: string[];
+    involved_ingredients: { [ingredient: string]: string[] };
+    productsInvolved: string[];
+  };
 };

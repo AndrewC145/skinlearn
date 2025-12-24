@@ -43,8 +43,6 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
             `api/users/products/${user.id}/`,
           );
 
-          console.log(response);
-
           const dayProds: RoutineProductType[] = response.data.dayProducts;
           const nightProds: RoutineProductType[] = response.data.nightProducts;
 
@@ -131,7 +129,7 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
   ) => {
     const infos: RoutineInfoType[] = [];
     const issues: { [identifier: string]: BadComboType } = {};
-    const identifiers = new Set<string[]>();
+
     await Promise.all(
       products.map(async (product: RoutineProductType) => {
         try {
@@ -148,8 +146,6 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
             },
           );
 
-          console.log(response);
-
           if (response.status === 200) {
             const analysis = response.data.analysis;
             const routineIssues = response.data.routineIssues;
@@ -163,13 +159,10 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
 
             if (routineIssues) {
               const badCombos = routineIssues.bad_combinations;
-              const productsInvolved: string[] =
-                routineIssues.products_involved;
+
               if (!issues[badCombos.identifier]) {
                 issues[badCombos.identifier] = {
                   combination: badCombos,
-                  productNames: productsInvolved,
-                  identifier: badCombos.identifier,
                 };
               }
             }
@@ -181,7 +174,6 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
     );
 
     setInfo(infos);
-    setIdentifiers(identifiers);
     setIssues(new Set(Object.values(issues)));
   };
 

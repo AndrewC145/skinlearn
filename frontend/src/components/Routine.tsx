@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { type SetStateAction, useEffect } from "react";
+import { type SetStateAction } from "react";
 import Product from "./Product";
 import EmptyRoutine from "./EmptyRoutine";
 import SearchModal from "./forms/SearchModal";
@@ -32,10 +32,6 @@ function Routine({
 }) {
   const { user, token } = useAuth();
   const { dayProductIds, nightProductIds } = useRoutine();
-
-  useEffect(() => {
-    console.log("Routine Issues:", routineIssues);
-  }, [routineIssues]);
 
   const removeProduct = async (p: RoutineProductType) => {
     const productId = p.id;
@@ -184,30 +180,25 @@ function RoutineIssueAlert({
 }: {
   routineIssues?: Set<BadComboType>;
 }) {
-  console.log(routineIssues);
   return (
     <>
       {routineIssues && routineIssues.size > 0 && (
         <div className="mt-4 w-full max-w-md rounded-lg border border-red-300 bg-red-50 p-4 text-center shadow">
           <InnerRoutineAlert text="Conflicting Ingredients Found:" />
           <ul className="space-y-1 text-sm text-red-800">
-            {Array.from(routineIssues).map((issue, idx: number) => (
+            {Array.from(routineIssues).map((issue: any, idx: number) => (
               <li key={idx}>
-                <span className="font-bold capitalize">
-                  {issue.combination
-                    .map((comboArr: string) =>
-                      Array.isArray(comboArr)
-                        ? comboArr.join(" + ")
-                        : typeof comboArr === "object"
-                          ? Object.values(comboArr)
-                              .find((val) => Array.isArray(val))
-                              ?.join(" + ")
-                          : String(comboArr),
-                    )
-                    .join(", ")}
+                <span>
+                  {issue.combination.map((obj: any) => (
+                    <div key={obj.identifier} className="mb-1">
+                      <span className="font-bold capitalize">
+                        {obj.combination.join(" + ")}{" "}
+                      </span>
+                      {"in "}
+                      <span>{obj.productsInvolved.join(", ")} </span>
+                    </div>
+                  ))}
                 </span>
-                {" in "}
-                <span className="italic">{issue.productNames?.join(", ")}</span>
               </li>
             ))}
           </ul>
