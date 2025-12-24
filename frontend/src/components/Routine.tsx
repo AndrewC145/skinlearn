@@ -38,7 +38,6 @@ function Routine({
   const { dayProductIds, nightProductIds } = useRoutine();
 
   const removeProduct = async (p: RoutineProductType) => {
-    const productId = p.id;
     if (user) {
       try {
         const response: AxiosResponse = await createApi(token).delete(
@@ -51,39 +50,44 @@ function Routine({
         );
 
         if (response.status === 200) {
-          removeFromProductIds(productId, day);
-          setProducts((prev) => {
-            prev.delete(p);
-            return new Set(prev);
-          });
+          updateProductInfos(p);
 
-          setProductInfo?.((prev: RoutineInfoType[]) => {
-            if (prev) {
-              const updatedInfo = prev.filter((info) => info.id !== productId);
-              return updatedInfo;
+          setRoutineIssues((prev) => {
+            const updatedIssues = { ...prev };
+            for (const key in updatedIssues) {
+              const issue = updatedIssues[key];
+              if (issue.combination.productsInvolved.includes(p.name)) {
+                delete updatedIssues[key];
+              }
             }
-            return prev;
+            return updatedIssues;
           });
         }
       } catch (error: any) {
         console.error(error);
       }
     } else {
-      removeFromProductIds(productId, day);
-      setProducts((prev) => {
-        prev.delete(p);
-        return new Set(prev);
-      });
-
-      setProductInfo?.((prev) => {
-        if (prev) {
-          const updatedInfo = prev.filter((info) => info.id !== productId);
-          return updatedInfo;
-        }
-        return prev;
-      });
+      updateProductInfos(p);
     }
   };
+
+  function updateProductInfos(p: RoutineProductType) {
+    const productId = p.id;
+
+    removeFromProductIds(productId, day);
+    setProducts((prev) => {
+      prev.delete(p);
+      return new Set(prev);
+    });
+
+    setProductInfo?.((prev) => {
+      if (prev) {
+        const updatedInfo = prev.filter((info) => info.id !== productId);
+        return updatedInfo;
+      }
+      return prev;
+    });
+  }
 
   function removeFromProductIds(id: number, day: boolean) {
     if (day) {
@@ -109,7 +113,7 @@ function Routine({
         />
       </div>
       <RoutineAlert productInfo={productInfo} />
-      <RoutineIssueAlert routineIssues={routineIssues} />
+      {user ? <RoutineIssueAlert routineIssues={routineIssues} /> : null}
       <div
         className={`mt-8 ${products.size && "grid max-h-[350px] grid-cols-1 gap-4 overflow-y-auto md:grid-cols-2"}`}
       >
