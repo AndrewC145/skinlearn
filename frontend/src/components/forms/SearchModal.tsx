@@ -26,15 +26,20 @@ import { usePersonalIngredients } from "../../context/PersonalIngredientsContext
 import { type ProductType } from "../../types/ProductType";
 import { useRoutine } from "../../context/RoutineContext";
 import { type RoutineInfoType } from "../../types/RoutineInfoType";
+import { type BadComboType } from "../../types/BadComboType";
 
 function SearchModal({
   day,
   setRoutineProducts,
   setProductInfo,
+  setRoutineIssues,
 }: {
   day: boolean;
   setRoutineProducts: React.Dispatch<SetStateAction<Set<RoutineProductType>>>;
   setProductInfo?: React.Dispatch<SetStateAction<RoutineInfoType[]>>;
+  setRoutineIssues: React.Dispatch<
+    SetStateAction<Record<string, BadComboType>>
+  >;
 }) {
   const [products, setProducts] = useState<ProductType[]>([]);
   const [searchText, setSearchText] = useState<string>("");
@@ -119,13 +124,23 @@ function SearchModal({
             name: p.name,
             comedogenic_ingredients: analysis.comedogenic_ingredients,
           };
-
           setProductInfo?.((prev) => {
             if (prev) {
               return [...prev, routineInfo];
             }
             return [routineInfo];
           });
+        }
+
+        const routineIssues = response.data.routineIssues;
+        if (routineIssues?.bad_combinations) {
+          const combo = routineIssues.bad_combinations;
+          setRoutineIssues((prev) => ({
+            ...prev,
+            [combo.identifier]: {
+              combination: combo,
+            },
+          }));
         }
         if (day) {
           setDayProductIds((prev) => new Set([...prev, p.id]));

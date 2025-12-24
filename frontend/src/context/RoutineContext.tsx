@@ -18,12 +18,14 @@ type RoutineContextType = {
   setDayProductInfo?: React.Dispatch<SetStateAction<RoutineInfoType[]>>;
   nightProductInfo?: RoutineInfoType[];
   setNightProductInfo?: React.Dispatch<SetStateAction<RoutineInfoType[]>>;
-  dayRoutineIssues?: Set<BadComboType>;
-  nightRoutineIssues?: Set<BadComboType>;
-  setDayRoutineIssues?: React.Dispatch<SetStateAction<Set<BadComboType>>>;
-  setNightRoutineIssues?: React.Dispatch<SetStateAction<Set<BadComboType>>>;
-  identifiers?: Set<string[]>;
-  setIdentifiers?: React.Dispatch<SetStateAction<Set<string[]>>>;
+  dayRoutineIssues: Record<string, BadComboType>;
+  nightRoutineIssues: Record<string, BadComboType>;
+  setDayRoutineIssues: React.Dispatch<
+    SetStateAction<Record<string, BadComboType>>
+  >;
+  setNightRoutineIssues: React.Dispatch<
+    SetStateAction<Record<string, BadComboType>>
+  >;
 };
 
 export const RoutineContext = createContext<RoutineContextType>({
@@ -41,12 +43,10 @@ export const RoutineContext = createContext<RoutineContextType>({
   setDayProductInfo: () => {},
   nightProductInfo: undefined,
   setNightProductInfo: () => {},
-  dayRoutineIssues: undefined,
-  nightRoutineIssues: undefined,
+  dayRoutineIssues: {},
+  nightRoutineIssues: {},
   setDayRoutineIssues: () => {},
   setNightRoutineIssues: () => {},
-  identifiers: new Set([]),
-  setIdentifiers: () => {},
 });
 
 export const useRoutine = () => {

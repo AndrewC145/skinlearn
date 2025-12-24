@@ -25,13 +25,12 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
   const [nightProductInfo, setNightProductInfo] = useState<RoutineInfoType[]>(
     [],
   );
-  const [dayRoutineIssues, setDayRoutineIssues] = useState<Set<BadComboType>>(
-    new Set([]),
-  );
+  const [dayRoutineIssues, setDayRoutineIssues] = useState<
+    Record<string, BadComboType>
+  >({});
   const [nightRoutineIssues, setNightRoutineIssues] = useState<
-    Set<BadComboType>
-  >(new Set([]));
-  const [identifiers, setIdentifiers] = useState<Set<string[]>>(new Set([]));
+    Record<string, BadComboType>
+  >({});
   const { user, token } = useAuth();
   const { personalIngredients } = usePersonalIngredients();
 
@@ -125,7 +124,7 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
     products: RoutineProductType[],
     day: boolean,
     setInfo: React.Dispatch<SetStateAction<RoutineInfoType[]>>,
-    setIssues: React.Dispatch<SetStateAction<Set<BadComboType>>>,
+    setIssues: React.Dispatch<SetStateAction<Record<string, BadComboType>>>,
   ) => {
     const infos: RoutineInfoType[] = [];
     const issues: { [identifier: string]: BadComboType } = {};
@@ -174,7 +173,7 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
     );
 
     setInfo(infos);
-    setIssues(new Set(Object.values(issues)));
+    setIssues(issues);
   };
 
   return (
@@ -194,6 +193,8 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
         setNightProductInfo,
         dayRoutineIssues,
         nightRoutineIssues,
+        setDayRoutineIssues,
+        setNightRoutineIssues,
       }}
     >
       {children}

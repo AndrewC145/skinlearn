@@ -21,6 +21,7 @@ function Routine({
   productInfo,
   setProductInfo,
   routineIssues,
+  setRoutineIssues,
 }: {
   day: boolean;
   icon: React.ReactNode;
@@ -28,7 +29,10 @@ function Routine({
   setProducts: React.Dispatch<SetStateAction<Set<RoutineProductType>>>;
   productInfo?: RoutineInfoType[];
   setProductInfo?: React.Dispatch<SetStateAction<RoutineInfoType[]>>;
-  routineIssues?: Set<BadComboType>;
+  routineIssues: Record<string, BadComboType>;
+  setRoutineIssues: React.Dispatch<
+    SetStateAction<Record<string, BadComboType>>
+  >;
 }) {
   const { user, token } = useAuth();
   const { dayProductIds, nightProductIds } = useRoutine();
@@ -101,6 +105,7 @@ function Routine({
           day={day}
           setRoutineProducts={setProducts}
           setProductInfo={setProductInfo}
+          setRoutineIssues={setRoutineIssues}
         />
       </div>
       <RoutineAlert productInfo={productInfo} />
@@ -178,33 +183,31 @@ function RoutineAlert({ productInfo }: { productInfo?: RoutineInfoType[] }) {
 function RoutineIssueAlert({
   routineIssues,
 }: {
-  routineIssues?: Set<BadComboType>;
+  routineIssues?: Record<string, BadComboType>;
 }) {
+  if (!routineIssues || Object.keys(routineIssues).length === 0) return null;
+  console.log(routineIssues);
   return (
-    <>
-      {routineIssues && routineIssues.size > 0 && (
-        <div className="mt-4 w-full max-w-md rounded-lg border border-red-300 bg-red-50 p-4 text-center shadow">
-          <InnerRoutineAlert text="Conflicting Ingredients Found:" />
-          <ul className="space-y-1 text-sm text-red-800">
-            {Array.from(routineIssues).map((issue: any, idx: number) => (
-              <li key={idx}>
-                <span>
-                  {issue.combination.map((obj: any) => (
-                    <div key={obj.identifier} className="mb-1">
-                      <span className="font-bold capitalize">
-                        {obj.combination.join(" + ")}{" "}
-                      </span>
-                      {"in "}
-                      <span>{obj.productsInvolved.join(", ")} </span>
-                    </div>
-                  ))}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </>
+    <div className="mt-4 w-full max-w-md rounded-lg border border-red-300 bg-red-50 p-4 text-center shadow">
+      <InnerRoutineAlert text="Conflicting Ingredients Found:" />
+      <ul className="space-y-1 text-sm text-red-800">
+        {Object.values(routineIssues).map((issue: any, idx: number) => (
+          <li key={idx}>
+            <span>
+              {issue.combination.map((obj: any) => (
+                <div key={obj.identifier} className="mb-1">
+                  <span className="font-bold capitalize">
+                    {obj.combination.join(" + ")}{" "}
+                  </span>
+                  {"in "}
+                  <span>{obj.productsInvolved.join(", ")} </span>
+                </div>
+              ))}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
