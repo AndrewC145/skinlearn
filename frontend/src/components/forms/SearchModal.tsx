@@ -27,6 +27,7 @@ import { type ProductType } from "../../types/ProductType";
 import { useRoutine } from "../../context/RoutineContext";
 import { type RoutineInfoType } from "../../types/RoutineInfoType";
 import { type BadComboType } from "../../types/BadComboType";
+import CustomProduct from "./CustomProduct";
 
 function SearchModal({
   day,
@@ -228,9 +229,7 @@ function EmptyRoutineChildren() {
       <Link to="/submit-product">
         <Button className="cursor-pointer">Submit Product</Button>
       </Link>
-      <Button variant="outline" className="cursor-pointer">
-        Add custom product
-      </Button>
+      <CustomProduct />
     </EmptyContent>
   );
 }
