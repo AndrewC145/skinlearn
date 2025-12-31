@@ -10,7 +10,7 @@ function RoutineTitle() {
       <h1 className="text-center text-5xl font-semibold">Routine Builder</h1>
       <Modal
         setPersonalIngredients={setPersonalIngredients}
-        personalIngredients={personalIngredients}
+        personalIngredients={personalIngredients || []}
         trigger={
           <Button className="cursor-pointer">
             Add Comedogenic Ingredients

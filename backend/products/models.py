@@ -42,6 +42,7 @@ class Products(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     image = CloudinaryField("image", null=True, blank=True)
+    custom_made = models.BooleanField(default=False)
 
 
 class ProductSubmission(models.Model):

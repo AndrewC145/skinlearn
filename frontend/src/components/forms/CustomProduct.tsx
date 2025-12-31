@@ -18,10 +18,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { productSchema, type productFormValues } from "../../types/formTypes";
+import {
+  customProductSchema,
+  type customProductFormValues,
+} from "../../types/formTypes";
 
-function CustomProduct() {
-  const { token } = useAuth();
+function CustomProduct({ day }: { day: boolean }) {
+  const { token, user } = useAuth();
   const [success, setSuccess] = useState<string | null>(null);
   const [customErr, setCustomErr] = useState<string | null>(null);
 
@@ -29,19 +32,20 @@ function CustomProduct() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<productFormValues>({
-    resolver: zodResolver(productSchema),
+  } = useForm<customProductFormValues>({
+    resolver: zodResolver(customProductSchema),
     defaultValues: {
       name: "",
       brand: "",
       ingredients: "",
+      day: day,
     },
   });
 
-  const onSubmit = async (data: productFormValues) => {
+  const onSubmit = async (data: customProductFormValues) => {
     try {
       const response = await createApi(token || null).post(
-        "api/products/submit/",
+        "api/products/submit/custom/",
         data,
         {
           headers: {

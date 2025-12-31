@@ -28,6 +28,42 @@ class SubmitProductThrottle(UserRateThrottle):
 
 
 @api_view(["POST"])
+@permission_classes([])
+@throttle_classes([SubmitProductThrottle])
+def submit_custom_product(request: any):
+    if request.method == "POST":
+        try:
+            request.data["ingredients"] = [
+                s.strip().lower() for s in re.split(r",|/", request.data["ingredients"])
+            ]
+            serialized_data = ProductSubmissionSerializer(data=request.data)
+
+            if serialized_data.is_valid():
+                product = serialized_data.save(created_by=None)
+                routine_type = request.data.get("day", True)
+
+                if request.user.is_authenticated:
+                    print("request.user:", request.user)
+                return Response(
+                    {"message": "Custom product submitted successfully!"},
+                    status=status.HTTP_201_CREATED,
+                )
+
+            return Response(
+                {"error": serialized_data.errors}, status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            return Response(
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    else:
+        return Response(
+            {"error": "Invalid request method."},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED,
+        )
+
+
+@api_view(["POST"])
 @permission_classes([IsAuthenticated])
 @authentication_classes([JWTAuthentication])
 @throttle_classes([SubmitProductThrottle])
@@ -128,7 +164,7 @@ class CustomPageNumberPagination(PageNumberPagination):
 @permission_classes([])
 def list_products(request):
     if request.method == "GET":
-        products = Products.objects.all().order_by("id")
+        products = Products.objects.filter(custom_made=False).order_by("id")
 
         product_pagination = CustomPageNumberPagination()
 

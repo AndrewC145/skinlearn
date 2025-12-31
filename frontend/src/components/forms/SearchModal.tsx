@@ -212,7 +212,7 @@ function SearchModal({
                   icon={<CircleQuestionMark />}
                   title="No product was found"
                   description="There are no products with this name. If you want to add it, please submit a request"
-                  children={<EmptyRoutineChildren />}
+                  children={<EmptyRoutineChildren day={day} />}
                 />
               )}
             </InfiniteScroll>
@@ -223,13 +223,13 @@ function SearchModal({
   );
 }
 
-function EmptyRoutineChildren() {
+function EmptyRoutineChildren({ day }: { day: boolean }) {
   return (
     <EmptyContent className="flex flex-row items-center justify-center">
       <Link to="/submit-product">
         <Button className="cursor-pointer">Submit Product</Button>
       </Link>
-      <CustomProduct />
+      <CustomProduct day={day} />
     </EmptyContent>
   );
 }
