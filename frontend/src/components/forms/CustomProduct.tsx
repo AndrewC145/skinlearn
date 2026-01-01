@@ -10,11 +10,18 @@ import {
   DialogDescription,
   DialogTrigger,
 } from "../ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { createApi } from "../../api";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
@@ -24,12 +31,13 @@ import {
 } from "../../types/formTypes";
 
 function CustomProduct({ day }: { day: boolean }) {
-  const { token, user } = useAuth();
+  const { token } = useAuth();
   const [success, setSuccess] = useState<string | null>(null);
   const [customErr, setCustomErr] = useState<string | null>(null);
 
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<customProductFormValues>({
@@ -38,6 +46,7 @@ function CustomProduct({ day }: { day: boolean }) {
       name: "",
       brand: "",
       ingredients: "",
+      category: "Cleanser",
       day: day,
     },
   });
@@ -110,6 +119,30 @@ function CustomProduct({ day }: { day: boolean }) {
                   {errors.ingredients.message}
                 </p>
               )}
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="category">Category</Label>
+              <Controller
+                name="category"
+                control={control}
+                defaultValue="Cleanser"
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger id="category" className="w-2/5">
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Cleanser">Cleanser</SelectItem>
+                      <SelectItem value="Moisturizer">Moisturizer</SelectItem>
+                      <SelectItem value="Toner">Toner</SelectItem>
+                      <SelectItem value="Sunscreen">Sunscreen</SelectItem>
+                      <SelectItem value="Serum">Serum</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
           </div>
           <DialogFooter>

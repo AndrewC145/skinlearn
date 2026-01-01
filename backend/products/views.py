@@ -12,6 +12,7 @@ from .serializer import (
     ProductSubmissionSerializer,
     ProductInformationSerializer,
     RoutineSerializer,
+    ProductSerializer,
 )
 from .models import Products, ProductSubmission
 from rest_framework.throttling import UserRateThrottle
@@ -20,6 +21,8 @@ from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
 from ingredients.views import handle_ingredients_check
 from ingredients.models import Ingredients
+from django.db import transaction
+from rest_framework import serializers
 
 
 # Create your views here.
@@ -30,37 +33,58 @@ class SubmitProductThrottle(UserRateThrottle):
 @api_view(["POST"])
 @permission_classes([])
 @throttle_classes([SubmitProductThrottle])
-def submit_custom_product(request: any):
-    if request.method == "POST":
-        try:
-            request.data["ingredients"] = [
-                s.strip().lower() for s in re.split(r",|/", request.data["ingredients"])
-            ]
-            serialized_data = ProductSubmissionSerializer(data=request.data)
-
-            if serialized_data.is_valid():
-                product = serialized_data.save(created_by=None)
-                routine_type = request.data.get("day", True)
-
-                if request.user.is_authenticated:
-                    print("request.user:", request.user)
-                return Response(
-                    {"message": "Custom product submitted successfully!"},
-                    status=status.HTTP_201_CREATED,
-                )
-
-            return Response(
-                {"error": serialized_data.errors}, status=status.HTTP_400_BAD_REQUEST
-            )
-        except Exception as e:
-            return Response(
-                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-    else:
+@authentication_classes([])
+def submit_custom_product(request):
+    if request.method != "POST":
         return Response(
             {"error": "Invalid request method."},
             status=status.HTTP_405_METHOD_NOT_ALLOWED,
         )
+
+    try:
+
+        raw_ingredients = [
+            s.strip().lower()
+            for s in re.split(r",|/", request.data.get("ingredients", ""))
+            if s.strip()
+        ]
+
+        extracted = {
+            "name": request.data.get("name", "").strip(),
+            "brand": request.data.get("brand", "").strip(),
+            "category": request.data.get("category", "Other"),
+            "raw_ingredients": raw_ingredients,
+            "ingredients": raw_ingredients,
+            "custom_made": True,
+        }
+
+        serializer = ProductSerializer(data=extracted)
+        serializer.is_valid(raise_exception=True)
+
+        with transaction.atomic():
+            product = serializer.save(
+                created_by=request.user if request.user.is_authenticated else None
+            )
+
+        if request.user.is_authenticated:
+            day_routine = request.data.get("day", True)
+            if day_routine:
+                request.user.day_products.add(product)
+            else:
+                request.user.night_products.add(product)
+
+        return Response(
+            {
+                "message": "Custom product submitted successfully!",
+                "product_id": product.id,
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+    except serializers.ValidationError as ve:
+        return Response({"error": ve.detail}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(["POST"])
@@ -171,7 +195,7 @@ def list_products(request):
         search_query = request.query_params.get("search", None)
 
         if search_query:
-            products = Products.objects.filter(
+            products = products.filter(
                 Q(name__icontains=search_query) | Q(brand__icontains=search_query)
             )
 
