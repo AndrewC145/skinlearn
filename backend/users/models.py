@@ -44,5 +44,9 @@ class User(AbstractUser):
     avoid_ingredients = ArrayField(
         models.CharField(max_length=80), blank=True, null=True
     )
-    day_products = models.ManyToManyField(Products, related_name="day_products")
-    night_products = models.ManyToManyField(Products, related_name="night_products")
+    day_products = models.ManyToManyField(
+        Products, related_name="users_with_day_products"
+    )
+    night_products = models.ManyToManyField(
+        Products, related_name="users_with_night_products"
+    )

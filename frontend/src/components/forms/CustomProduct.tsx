@@ -31,7 +31,7 @@ import {
 } from "../../types/formTypes";
 
 function CustomProduct({ day }: { day: boolean }) {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [success, setSuccess] = useState<string | null>(null);
   const [customErr, setCustomErr] = useState<string | null>(null);
 
@@ -52,21 +52,27 @@ function CustomProduct({ day }: { day: boolean }) {
   });
 
   const onSubmit = async (data: customProductFormValues) => {
-    try {
-      const response = await createApi(token || null).post(
-        "api/products/submit/custom/",
-        data,
-        {
-          headers: {
-            "Content-Type": "application/json",
+    if (user) {
+      try {
+        const response = await createApi(token).post(
+          "api/products/submit/custom/",
+          data,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
           },
-          withCredentials: true,
-        },
-      );
+        );
 
-      console.log(response);
-    } catch (error: any) {
-      console.error(error);
+        console.log(response);
+        if (response.status === 201) {
+          setSuccess("Custom product added successfully!");
+          setCustomErr(null);
+        }
+      } catch (error: any) {
+        console.error(error);
+      }
     }
   };
 
@@ -76,81 +82,89 @@ function CustomProduct({ day }: { day: boolean }) {
         <DialogTrigger asChild>
           <Button variant="outline">Add Custom Product</Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Add Custom Product</DialogTitle>
-            <DialogDescription>
-              Fill in the details below to add a custom product.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="name">Product Name</Label>
-              <Input
-                id="name"
-                placeholder="Enter product name"
-                {...register("name")}
-              />
-              {errors.name && (
-                <p className="text-sm text-red-500">{errors.name.message}</p>
-              )}
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="brand">Brand</Label>
-              <Input
-                id="brand"
-                placeholder="Enter brand name"
-                {...register("brand")}
-              />
-              {errors.brand && (
-                <p className="text-sm text-red-500">{errors.brand.message}</p>
-              )}
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="ingredients">Ingredients</Label>
-              <Textarea
-                rows={5}
-                id="ingredients"
-                placeholder="List ingredients separated by commas"
-                {...register("ingredients")}
-              />
-              {errors.ingredients && (
-                <p className="text-sm text-red-500">
-                  {errors.ingredients.message}
-                </p>
-              )}
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="category">Category</Label>
-              <Controller
-                name="category"
-                control={control}
-                defaultValue="Cleanser"
-                rules={{ required: true }}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger id="category" className="w-2/5">
-                      <SelectValue placeholder="Select a category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Cleanser">Cleanser</SelectItem>
-                      <SelectItem value="Moisturizer">Moisturizer</SelectItem>
-                      <SelectItem value="Toner">Toner</SelectItem>
-                      <SelectItem value="Sunscreen">Sunscreen</SelectItem>
-                      <SelectItem value="Serum">Serum</SelectItem>
-                      <SelectItem value="Other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
+        {user ? (
+          <DialogContent className="sm:max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Add Custom Product</DialogTitle>
+              <DialogDescription>
+                Fill in the details below to add a custom product.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="name">Product Name</Label>
+                <Input
+                  id="name"
+                  placeholder="Enter product name"
+                  {...register("name")}
+                />
+                {errors.name && (
+                  <p className="text-sm text-red-500">{errors.name.message}</p>
                 )}
-              />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="brand">Brand</Label>
+                <Input
+                  id="brand"
+                  placeholder="Enter brand name"
+                  {...register("brand")}
+                />
+                {errors.brand && (
+                  <p className="text-sm text-red-500">{errors.brand.message}</p>
+                )}
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="ingredients">Ingredients</Label>
+                <Textarea
+                  rows={5}
+                  id="ingredients"
+                  placeholder="List ingredients separated by commas"
+                  {...register("ingredients")}
+                />
+                {errors.ingredients && (
+                  <p className="text-sm text-red-500">
+                    {errors.ingredients.message}
+                  </p>
+                )}
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="category">Category</Label>
+                <Controller
+                  name="category"
+                  control={control}
+                  defaultValue="Cleanser"
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger id="category" className="w-2/5">
+                        <SelectValue placeholder="Select a category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Cleanser">Cleanser</SelectItem>
+                        <SelectItem value="Moisturizer">Moisturizer</SelectItem>
+                        <SelectItem value="Toner">Toner</SelectItem>
+                        <SelectItem value="Sunscreen">Sunscreen</SelectItem>
+                        <SelectItem value="Serum">Serum</SelectItem>
+                        <SelectItem value="Other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.category && (
+                  <p className="text-sm text-red-500">
+                    {errors.category.message}
+                  </p>
+                )}
+              </div>
+              {success && <p className="text-sm text-green-500">{success}</p>}
             </div>
-          </div>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button onClick={handleSubmit(onSubmit)}>Submit</Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button onClick={handleSubmit(onSubmit)}>Submit</Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        ) : null}
       </form>
     </Dialog>
   );

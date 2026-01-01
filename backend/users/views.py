@@ -171,12 +171,12 @@ def get_user_products(request, pk):
     if request.method == "GET":
         try:
             user = User.objects.get(pk=pk)
+
             day_products = user.day_products.all()
+            night_products = user.night_products.all()
             day_products_serializer = SimpleProductSerializer(
                 day_products, many=True
             ).data
-
-            night_products = user.night_products.all()
             night_products_serializer = SimpleProductSerializer(
                 night_products, many=True
             ).data

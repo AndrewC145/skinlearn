@@ -176,8 +176,11 @@ class ProductSubmissionSerializer(serializers.ModelSerializer):
 
 class RoutineProductSerializer(serializers.Serializer):
     id = serializers.IntegerField()
-    name = serializers.CharField(required=False)
-    image = serializers.CharField(required=False)
+
+    def validate_id(self, value):
+        if not Products.objects.filter(id=value).exists():
+            raise serializers.ValidationError("Invalid product ID")
+        return value
 
 
 class RoutineSerializer(serializers.Serializer):

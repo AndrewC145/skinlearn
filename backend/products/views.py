@@ -31,9 +31,9 @@ class SubmitProductThrottle(UserRateThrottle):
 
 
 @api_view(["POST"])
-@permission_classes([])
+@permission_classes([IsAuthenticated])
 @throttle_classes([SubmitProductThrottle])
-@authentication_classes([])
+@authentication_classes([JWTAuthentication])
 def submit_custom_product(request):
     if request.method != "POST":
         return Response(
@@ -42,7 +42,6 @@ def submit_custom_product(request):
         )
 
     try:
-
         raw_ingredients = [
             s.strip().lower()
             for s in re.split(r",|/", request.data.get("ingredients", ""))
@@ -67,11 +66,13 @@ def submit_custom_product(request):
             )
 
         if request.user.is_authenticated:
+
             day_routine = request.data.get("day", True)
             if day_routine:
                 request.user.day_products.add(product)
             else:
                 request.user.night_products.add(product)
+            request.user.save()
 
         return Response(
             {
@@ -213,63 +214,63 @@ def list_products(request):
 @api_view(["POST"])
 @permission_classes([])
 def save_and_analyze_product(request):
-    if request.method == "POST":
-        serializer = RoutineSerializer(data=request.data)
-        if serializer.is_valid():
-            product_data = serializer.validated_data["product"]
-            product_id = product_data["id"]
-            day_routine = serializer.validated_data["day_routine"]
+    serializer = RoutineSerializer(data=request.data)
 
-            try:
-                product = Products.objects.get(id=product_id)
-            except Products.DoesNotExist as e:
-                return Response(
-                    {"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND
-                )
-
-            if request.user.is_authenticated:
-
-                if (
-                    day_routine
-                    and not request.user.day_products.filter(id=product_id).exists()
-                ):
-                    request.user.day_products.add(product)
-                elif (
-                    not day_routine
-                    and not request.user.night_products.filter(id=product_id).exists()
-                ):
-                    request.user.night_products.add(product)
-                avoid_ing = request.user.avoid_ingredients
-                all_products = (
-                    request.user.day_products.all() | request.user.night_products.all()
-                )
-            else:
-                avoid_ing = request.data.get("personalIngredients", [])
-
-            comedogenic_ingredients = handle_ingredients_check(
-                product.raw_ingredients, avoid_ing
-            )
-            analysis = {
-                "id": product.id,
-                "name": product.name,
-                "comedogenic_ingredients": comedogenic_ingredients,
-            }
-
-            routine_issues = (
-                check_routine_compatibility(all_products)
-                if request.user.is_authenticated
-                else []
-            )
-
-            return Response(
-                {"analysis": analysis, "routineIssues": routine_issues},
-                status=status.HTTP_200_OK,
-            )
-    else:
+    if not serializer.is_valid():
         return Response(
-            {"error": "Invalid request method"},
-            status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            {"error": serializer.errors},
+            status=status.HTTP_400_BAD_REQUEST,
         )
+
+    product_data = serializer.validated_data["product"]
+    product_id = product_data["id"]
+    day_routine = serializer.validated_data["day_routine"]
+
+    try:
+        product = Products.objects.get(id=product_id)
+    except Products.DoesNotExist:
+        return Response(
+            {"error": "Product not found"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    if request.user.is_authenticated:
+        if day_routine and not request.user.day_products.filter(id=product_id).exists():
+            request.user.day_products.add(product)
+        elif (
+            not day_routine
+            and not request.user.night_products.filter(id=product_id).exists()
+        ):
+            request.user.night_products.add(product)
+
+        avoid_ing = request.user.avoid_ingredients
+        all_products = (
+            request.user.day_products.all() | request.user.night_products.all()
+        )
+    else:
+        avoid_ing = request.data.get("personalIngredients", [])
+        all_products = Products.objects.none()
+
+    comedogenic_ingredients = handle_ingredients_check(
+        product.raw_ingredients, avoid_ing
+    )
+
+    analysis = {
+        "id": product.id,
+        "name": product.name,
+        "comedogenic_ingredients": comedogenic_ingredients,
+    }
+
+    routine_issues = (
+        check_routine_compatibility(all_products)
+        if request.user.is_authenticated
+        else []
+    )
+
+    return Response(
+        {"analysis": analysis, "routineIssues": routine_issues},
+        status=status.HTTP_200_OK,
+    )
 
 
 def check_routine_compatibility(products):
