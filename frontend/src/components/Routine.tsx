@@ -171,7 +171,7 @@ function RoutineAlert({ productInfo }: { productInfo?: RoutineInfoType[] }) {
           <ul className="space-y-1 text-sm text-red-800">
             {productInfo.map((info: RoutineInfoType, idx: number) => (
               <li key={idx}>
-                <span className="font-bold">{info.name}:</span>{" "}
+                <span className="font-bold capitalize">{info.name}:</span>{" "}
                 <span className="inline-block rounded bg-red-100 px-2 py-0.5 capitalize">
                   {info.comedogenic_ingredients.join(", ")}
                 </span>
