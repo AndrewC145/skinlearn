@@ -208,6 +208,15 @@ def delete_user_product(request, pk):
             else:
                 product = user.night_products.get(id=product_id)
                 user.night_products.remove(product)
+
+            if (
+                product.custom_made
+                and product.created_by == user
+                and product not in user.day_products.all()
+                and product not in user.night_products.all()
+            ):
+                product.delete()
+
         except Products.DoesNotExist as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         all_products = user.day_products.all() | user.night_products.all()
