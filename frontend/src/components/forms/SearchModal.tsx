@@ -212,7 +212,12 @@ function SearchModal({
                   icon={<CircleQuestionMark />}
                   title="No product was found"
                   description="There are no products with this name. If you want to add it, please submit a request"
-                  children={<EmptyRoutineChildren day={day} />}
+                  children={
+                    <EmptyRoutineChildren
+                      day={day}
+                      setRoutineProducts={setRoutineProducts}
+                    />
+                  }
                 />
               )}
             </InfiniteScroll>
@@ -223,13 +228,19 @@ function SearchModal({
   );
 }
 
-function EmptyRoutineChildren({ day }: { day: boolean }) {
+function EmptyRoutineChildren({
+  day,
+  setRoutineProducts,
+}: {
+  day: boolean;
+  setRoutineProducts?: React.Dispatch<SetStateAction<Set<RoutineProductType>>>;
+}) {
   return (
     <EmptyContent className="flex flex-row items-center justify-center">
       <Link to="/submit-product">
         <Button className="cursor-pointer">Submit Product</Button>
       </Link>
-      <CustomProduct day={day} />
+      <CustomProduct day={day} setRoutineProducts={setRoutineProducts} />
     </EmptyContent>
   );
 }

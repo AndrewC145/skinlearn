@@ -55,6 +55,7 @@ def submit_custom_product(request):
             "raw_ingredients": raw_ingredients,
             "ingredients": raw_ingredients,
             "custom_made": True,
+            "user_added": True,
         }
 
         serializer = ProductSerializer(data=extracted)
@@ -77,7 +78,7 @@ def submit_custom_product(request):
         return Response(
             {
                 "message": "Custom product submitted successfully!",
-                "product_id": product.id,
+                "product": serializer.data,
             },
             status=status.HTTP_201_CREATED,
         )

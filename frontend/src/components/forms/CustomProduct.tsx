@@ -29,9 +29,25 @@ import {
   customProductSchema,
   type customProductFormValues,
 } from "../../types/formTypes";
+import { type RoutineProductType } from "../../types/RoutineProductType";
+import { useRoutine } from "../../context/RoutineContext";
 
-function CustomProduct({ day }: { day: boolean }) {
+function CustomProduct({
+  day,
+  setRoutineProducts,
+}: {
+  day: boolean;
+  setRoutineProducts?: React.Dispatch<
+    React.SetStateAction<Set<RoutineProductType>>
+  >;
+}) {
   const { token, user } = useAuth();
+  const {
+    dayProductIds,
+    nightProductIds,
+    setDayProductIds,
+    setNightProductIds,
+  } = useRoutine();
   const [success, setSuccess] = useState<string | null>(null);
   const [customErr, setCustomErr] = useState<string | null>(null);
 
@@ -69,9 +85,29 @@ function CustomProduct({ day }: { day: boolean }) {
         if (response.status === 201) {
           setSuccess("Custom product added successfully!");
           setCustomErr(null);
+
+          const product = response.data.product;
+
+          if (day) {
+            setDayProductIds(
+              new Set([...Array.from(dayProductIds), product.id]),
+            );
+          } else {
+            setNightProductIds(
+              new Set([...Array.from(nightProductIds), product.id]),
+            );
+          }
+
+          setRoutineProducts?.(
+            (prev) => new Set([...Array.from(prev), product]),
+          );
         }
       } catch (error: any) {
         console.error(error);
+        setCustomErr(
+          error.response?.data?.error || "An error occurred. Please try again.",
+        );
+        setSuccess(null);
       }
     }
   };
@@ -157,6 +193,7 @@ function CustomProduct({ day }: { day: boolean }) {
                 )}
               </div>
               {success && <p className="text-sm text-green-500">{success}</p>}
+              {customErr && <p className="text-sm text-red-500">{customErr}</p>}
             </div>
             <DialogFooter>
               <DialogClose asChild>
