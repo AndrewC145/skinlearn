@@ -8,6 +8,7 @@ import { createApi } from "../api";
 import { type RoutineInfoType } from "../types/RoutineInfoType";
 import { type BadComboType } from "../types/BadComboType";
 import { usePersonalIngredients } from "./PersonalIngredientsContext";
+import { type SuggestionType } from "../types/Suggestion";
 
 function RoutineProvider({ children }: { children: React.ReactNode }) {
   const [dayProducts, setDayProducts] = useState<Set<RoutineProductType>>(
@@ -31,8 +32,10 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
   const [nightRoutineIssues, setNightRoutineIssues] = useState<
     Record<string, BadComboType>
   >({});
-  const [daySuggestions, setDaySuggestions] = useState<string[]>([]);
-  const [nightSuggestions, setNightSuggestions] = useState<string[]>([]);
+  const [daySuggestions, setDaySuggestions] = useState<SuggestionType[]>([]);
+  const [nightSuggestions, setNightSuggestions] = useState<SuggestionType[]>(
+    [],
+  );
   const { user, token } = useAuth();
   const { personalIngredients } = usePersonalIngredients();
 
@@ -129,7 +132,7 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
     day: boolean,
     setInfo: React.Dispatch<SetStateAction<RoutineInfoType[]>>,
     setIssues: React.Dispatch<SetStateAction<Record<string, BadComboType>>>,
-    setSuggestions: React.Dispatch<SetStateAction<string[]>>,
+    setSuggestions: React.Dispatch<SetStateAction<SuggestionType[]>>,
   ) => {
     const infos: RoutineInfoType[] = [];
     const issues: { [identifier: string]: BadComboType } = {};
@@ -149,6 +152,8 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
               withCredentials: true,
             },
           );
+
+          console.log(response);
 
           if (response.status === 200) {
             const analysis = response.data.analysis;

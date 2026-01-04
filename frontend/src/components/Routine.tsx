@@ -14,6 +14,7 @@ import { type RoutineInfoType } from "../types/RoutineInfoType";
 import { type BadComboType } from "../types/BadComboType";
 import InnerRoutineAlert from "./InnerRoutineAlert";
 import Suggestion from "./Suggestion";
+import { type SuggestionType } from "../types/Suggestion";
 
 function Routine({
   day,
@@ -37,8 +38,8 @@ function Routine({
   setRoutineIssues: React.Dispatch<
     SetStateAction<Record<string, BadComboType>>
   >;
-  suggestions?: string[];
-  setSuggestions?: React.Dispatch<SetStateAction<string[]>>;
+  suggestions?: SuggestionType[];
+  setSuggestions?: React.Dispatch<SetStateAction<SuggestionType[]>>;
 }) {
   const { user, token } = useAuth();
   const { dayProductIds, nightProductIds } = useRoutine();
@@ -69,12 +70,14 @@ function Routine({
             return updatedIssues;
           });
 
-          setSuggestions?.((prev) => {
-            if (p.category && !prev.includes(p.category)) {
-              return [...prev, p.category];
-            }
-            return prev;
-          });
+          setSuggestions?.((prev: SuggestionType[]) =>
+            prev
+              .map((s) => ({
+                ...s,
+                productIds: s.productIds.filter((id) => id !== p.id),
+              }))
+              .filter((s) => s.productIds.length > 0),
+          );
         }
       } catch (error: any) {
         console.error(error);

@@ -28,6 +28,7 @@ import { useRoutine } from "../../context/RoutineContext";
 import { type RoutineInfoType } from "../../types/RoutineInfoType";
 import { type BadComboType } from "../../types/BadComboType";
 import CustomProduct from "./CustomProduct";
+import { type SuggestionType } from "../../types/Suggestion";
 
 function SearchModal({
   day,
@@ -42,7 +43,7 @@ function SearchModal({
   setRoutineIssues: React.Dispatch<
     SetStateAction<Record<string, BadComboType>>
   >;
-  setSuggestions?: React.Dispatch<SetStateAction<string[]>>;
+  setSuggestions?: React.Dispatch<SetStateAction<SuggestionType[]>>;
 }) {
   const [products, setProducts] = useState<ProductType[]>([]);
   const [searchText, setSearchText] = useState<string>("");
@@ -147,16 +148,30 @@ function SearchModal({
             });
           }
         }
-        const suggestions = response.data.suggestions;
-        for (const suggestion of suggestions) {
-          setSuggestions?.((prev) => {
-            if (!prev.includes(suggestion)) {
-              return [...prev, suggestion];
-            }
-            return prev;
+        setSuggestions?.((prev) => {
+          const suggestionMap = new Map<number, SuggestionType>();
+          prev.forEach((s) => {
+            suggestionMap.set(s.id, s);
           });
-        }
 
+          response.data.suggestions.forEach((s: SuggestionType) => {
+            if (suggestionMap.has(s.id)) {
+              const existing = suggestionMap.get(s.id);
+              if (existing) {
+                suggestionMap.set(s.id, {
+                  ...existing,
+                  productIds: Array.from(
+                    new Set([...existing.productIds, ...s.productIds]),
+                  ),
+                });
+              }
+            } else {
+              suggestionMap.set(s.id, s);
+            }
+          });
+
+          return Array.from(suggestionMap.values());
+        });
         if (day) {
           setDayProductIds((prev) => new Set([...prev, p.id]));
         } else {

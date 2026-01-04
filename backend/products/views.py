@@ -268,14 +268,9 @@ def save_and_analyze_product(request):
         else []
     )
 
-    ingredient_categories = get_ingredient_categories(all_products)
-    product_categories = get_product_categories(all_products)
     current_routine = "day" if day_routine else "night"
 
-    suggestions = generate_suggestions(
-        product_categories, ingredient_categories, current_routine
-    )
-
+    suggestions = generate_suggestions(all_products, current_routine)
     return Response(
         {
             "analysis": analysis,
@@ -394,36 +389,35 @@ SUGGESTIVE_RULES = [
 ]
 
 
-def get_ingredient_categories(products):
-    return set(
-        Ingredients.objects.filter(products__in=products).values_list(
-            "category", flat=True
-        )
-    )
-
-
-def get_product_categories(products):
-    categories = set()
-    for product in products:
-        categories.add(product.category)
-    return categories
-
-
-def generate_suggestions(product_categories, ingredient_categories, current_routine):
+def generate_suggestions(products, current_time):
     suggestions = []
-    seen = set()
+    ingredient_categories = {}
+
+    for product in products:
+        ingredient_categories[product.id] = set(
+            product.ingredients.values_list("category", flat=True)
+        )
+
+    product_categories = {product.id: product.category for product in products}
+
     for rule in SUGGESTIVE_RULES:
-        if rule["current_time"] != current_routine:
-            continue
-        if rule["id"] in seen:
+        if rule["current_time"] != current_time:
             continue
 
-        if rule["type"] == "ingredient" and rule["category"] in ingredient_categories:
-            suggestions.append(rule["message"])
-            seen.add(rule["id"])
-
-        elif rule["type"] == "product" and rule["category"] in product_categories:
-            suggestions.append(rule["message"])
-            seen.add(rule["id"])
-
+        triggered_by = []
+        for product in products:
+            if rule["type"] == "ingredient":
+                if rule["category"] in ingredient_categories[product.id]:
+                    triggered_by.append(product.id)
+            elif rule["type"] == "product":
+                if rule["category"] == product_categories[product.id]:
+                    triggered_by.append(product.id)
+        if triggered_by:
+            suggestions.append(
+                {
+                    "id": rule["id"],
+                    "message": rule["message"],
+                    "productIds": triggered_by,
+                }
+            )
     return suggestions

@@ -2,6 +2,7 @@ import { useContext, createContext, type SetStateAction } from "react";
 import { type RoutineProductType } from "../types/RoutineProductType";
 import { type RoutineInfoType } from "../types/RoutineInfoType";
 import { type BadComboType } from "../types/BadComboType";
+import { type SuggestionType } from "../types/Suggestion";
 
 type RoutineContextType = {
   dayProducts: Set<RoutineProductType>;
@@ -26,10 +27,10 @@ type RoutineContextType = {
   setNightRoutineIssues: React.Dispatch<
     SetStateAction<Record<string, BadComboType>>
   >;
-  daySuggestions?: string[];
-  nightSuggestions?: string[];
-  setDaySuggestions?: React.Dispatch<SetStateAction<string[]>>;
-  setNightSuggestions?: React.Dispatch<SetStateAction<string[]>>;
+  daySuggestions?: SuggestionType[];
+  nightSuggestions?: SuggestionType[];
+  setDaySuggestions?: React.Dispatch<SetStateAction<SuggestionType[]>>;
+  setNightSuggestions?: React.Dispatch<SetStateAction<SuggestionType[]>>;
 };
 
 export const RoutineContext = createContext<RoutineContextType>({
