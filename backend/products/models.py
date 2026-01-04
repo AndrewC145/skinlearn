@@ -42,6 +42,16 @@ class Products(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     image = CloudinaryField("image", null=True, blank=True)
+    custom_made = models.BooleanField(default=False)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name", "created_by"],
+                condition=models.Q(custom_made=True),
+                name="unique_custom_product_per_user",
+            )
+        ]
 
 
 class ProductSubmission(models.Model):

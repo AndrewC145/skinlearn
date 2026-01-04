@@ -19,6 +19,7 @@ from .serializer import (
     CustomTokenObtainPairSerializer,
     AvoidIngredientsSerializer,
 )
+from products.views import check_routine_compatibility
 from products.serializer import SimpleProductSerializer
 from django.contrib.auth import get_user_model
 from rest_framework.throttling import AnonRateThrottle
@@ -170,12 +171,12 @@ def get_user_products(request, pk):
     if request.method == "GET":
         try:
             user = User.objects.get(pk=pk)
+
             day_products = user.day_products.all()
+            night_products = user.night_products.all()
             day_products_serializer = SimpleProductSerializer(
                 day_products, many=True
             ).data
-
-            night_products = user.night_products.all()
             night_products_serializer = SimpleProductSerializer(
                 night_products, many=True
             ).data
@@ -207,10 +208,24 @@ def delete_user_product(request, pk):
             else:
                 product = user.night_products.get(id=product_id)
                 user.night_products.remove(product)
+
+            if (
+                product.custom_made
+                and product.created_by == user
+                and product not in user.day_products.all()
+                and product not in user.night_products.all()
+            ):
+                product.delete()
+
         except Products.DoesNotExist as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        all_products = user.day_products.all() | user.night_products.all()
+        routine_issues = check_routine_compatibility(all_products)
 
-        return Response({"message": "Received"}, status=status.HTTP_200_OK)
+        return Response(
+            {"routineIssues": routine_issues},
+            status=status.HTTP_200_OK,
+        )
     return Response(
         {"error": "Invalid request method"}, status=status.HTTP_405_METHOD_NOT_ALLOWED
     )

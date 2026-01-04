@@ -13,10 +13,18 @@ function Builder() {
     setDayProductInfo,
     nightProductInfo,
     setNightProductInfo,
+    dayRoutineIssues,
+    nightRoutineIssues,
+    setDayRoutineIssues,
+    setNightRoutineIssues,
+    setDaySuggestions,
+    setNightSuggestions,
+    daySuggestions,
+    nightSuggestions,
   } = useRoutine();
 
   return (
-    <section className="flex min-h-screen items-center justify-center py-8">
+    <section className="flex min-h-screen items-center justify-center py-20">
       <div className="flex flex-col gap-20">
         <RoutineTitle />
         <div className="flex justify-between gap-8 px-8">
@@ -26,7 +34,11 @@ function Builder() {
             setProducts={setDayProducts}
             productInfo={dayProductInfo}
             setProductInfo={setDayProductInfo}
+            routineIssues={dayRoutineIssues}
+            setRoutineIssues={setDayRoutineIssues}
             icon={<Sun />}
+            suggestions={daySuggestions}
+            setSuggestions={setDaySuggestions}
           />
           <Routine
             day={false}
@@ -34,7 +46,11 @@ function Builder() {
             setProducts={setNightProducts}
             productInfo={nightProductInfo}
             setProductInfo={setNightProductInfo}
+            routineIssues={nightRoutineIssues}
+            setRoutineIssues={setNightRoutineIssues}
             icon={<Moon />}
+            suggestions={nightSuggestions}
+            setSuggestions={setNightSuggestions}
           />
         </div>
       </div>

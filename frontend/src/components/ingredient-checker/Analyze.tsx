@@ -101,7 +101,7 @@ function Analyze() {
               onClick={onReset}
             />
             <Modal
-              personalIngredients={personalIngredients}
+              personalIngredients={personalIngredients || []}
               setPersonalIngredients={setPersonalIngredients}
               trigger={
                 <Button

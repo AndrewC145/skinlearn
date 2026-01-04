@@ -78,6 +78,8 @@ def handle_ingredients_check(ingredients, avoid_ing):
     return comedogenic_ingredients
 
 
+
+
 @api_view(["GET"])
 @permission_classes([])
 def get_all_ingredients(request: any):

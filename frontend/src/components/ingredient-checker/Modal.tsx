@@ -154,7 +154,7 @@ function Modal({
           <div className="grid gap-3">
             <Label>Ingredient List</Label>
             <div className="flex flex-wrap gap-4">
-              {personalIngredients.length > 0 ? (
+              {personalIngredients && personalIngredients.length > 0 ? (
                 personalIngredients.map((ingredient, index) => (
                   <IngredientItem
                     onClick={() => deleteIngredient(ingredient)}

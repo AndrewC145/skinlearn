@@ -26,15 +26,24 @@ import { usePersonalIngredients } from "../../context/PersonalIngredientsContext
 import { type ProductType } from "../../types/ProductType";
 import { useRoutine } from "../../context/RoutineContext";
 import { type RoutineInfoType } from "../../types/RoutineInfoType";
+import { type BadComboType } from "../../types/BadComboType";
+import CustomProduct from "./CustomProduct";
+import { type SuggestionType } from "../../types/Suggestion";
 
 function SearchModal({
   day,
   setRoutineProducts,
   setProductInfo,
+  setRoutineIssues,
+  setSuggestions,
 }: {
   day: boolean;
   setRoutineProducts: React.Dispatch<SetStateAction<Set<RoutineProductType>>>;
   setProductInfo?: React.Dispatch<SetStateAction<RoutineInfoType[]>>;
+  setRoutineIssues: React.Dispatch<
+    SetStateAction<Record<string, BadComboType>>
+  >;
+  setSuggestions?: React.Dispatch<SetStateAction<SuggestionType[]>>;
 }) {
   const [products, setProducts] = useState<ProductType[]>([]);
   const [searchText, setSearchText] = useState<string>("");
@@ -89,7 +98,12 @@ function SearchModal({
   };
 
   const addProduct = async (p: ProductType) => {
-    if (dayProductIds.has(p.id) || nightProductIds.has(p.id)) return;
+    if (
+      (day && dayProductIds.has(p.id)) ||
+      (!day && nightProductIds.has(p.id))
+    ) {
+      return;
+    }
 
     try {
       const response: AxiosResponse = await createApi(token || null).post(
@@ -104,6 +118,7 @@ function SearchModal({
           withCredentials: true,
         },
       );
+
       if (response.status === 200) {
         const analysis = response.data.analysis;
         if (analysis.comedogenic_ingredients.length > 0) {
@@ -112,7 +127,6 @@ function SearchModal({
             name: p.name,
             comedogenic_ingredients: analysis.comedogenic_ingredients,
           };
-
           setProductInfo?.((prev) => {
             if (prev) {
               return [...prev, routineInfo];
@@ -120,6 +134,44 @@ function SearchModal({
             return [routineInfo];
           });
         }
+
+        const routineIssues = response.data.routineIssues;
+        if (routineIssues.bad_combinations.length > 0) {
+          for (const combo of routineIssues.bad_combinations) {
+            setRoutineIssues((prev) => {
+              return {
+                ...prev,
+                [combo.identifier]: {
+                  combination: combo,
+                },
+              };
+            });
+          }
+        }
+        setSuggestions?.((prev) => {
+          const suggestionMap = new Map<number, SuggestionType>();
+          prev.forEach((s) => {
+            suggestionMap.set(s.id, s);
+          });
+
+          response.data.suggestions.forEach((s: SuggestionType) => {
+            if (suggestionMap.has(s.id)) {
+              const existing = suggestionMap.get(s.id);
+              if (existing) {
+                suggestionMap.set(s.id, {
+                  ...existing,
+                  productIds: Array.from(
+                    new Set([...existing.productIds, ...s.productIds]),
+                  ),
+                });
+              }
+            } else {
+              suggestionMap.set(s.id, s);
+            }
+          });
+
+          return Array.from(suggestionMap.values());
+        });
         if (day) {
           setDayProductIds((prev) => new Set([...prev, p.id]));
         } else {
@@ -187,7 +239,12 @@ function SearchModal({
                   icon={<CircleQuestionMark />}
                   title="No product was found"
                   description="There are no products with this name. If you want to add it, please submit a request"
-                  children={<EmptyRoutineChildren />}
+                  children={
+                    <EmptyRoutineChildren
+                      day={day}
+                      setRoutineProducts={setRoutineProducts}
+                    />
+                  }
                 />
               )}
             </InfiniteScroll>
@@ -198,15 +255,19 @@ function SearchModal({
   );
 }
 
-function EmptyRoutineChildren() {
+function EmptyRoutineChildren({
+  day,
+  setRoutineProducts,
+}: {
+  day: boolean;
+  setRoutineProducts?: React.Dispatch<SetStateAction<Set<RoutineProductType>>>;
+}) {
   return (
     <EmptyContent className="flex flex-row items-center justify-center">
       <Link to="/submit-product">
         <Button className="cursor-pointer">Submit Product</Button>
       </Link>
-      <Button variant="outline" className="cursor-pointer">
-        Add custom product
-      </Button>
+      <CustomProduct day={day} setRoutineProducts={setRoutineProducts} />
     </EmptyContent>
   );
 }

@@ -6,7 +6,9 @@ import { useAuth } from "./AuthContext";
 import { type AxiosResponse } from "axios";
 import { createApi } from "../api";
 import { type RoutineInfoType } from "../types/RoutineInfoType";
+import { type BadComboType } from "../types/BadComboType";
 import { usePersonalIngredients } from "./PersonalIngredientsContext";
+import { type SuggestionType } from "../types/Suggestion";
 
 function RoutineProvider({ children }: { children: React.ReactNode }) {
   const [dayProducts, setDayProducts] = useState<Set<RoutineProductType>>(
@@ -22,6 +24,16 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
   );
   const [dayProductInfo, setDayProductInfo] = useState<RoutineInfoType[]>([]);
   const [nightProductInfo, setNightProductInfo] = useState<RoutineInfoType[]>(
+    [],
+  );
+  const [dayRoutineIssues, setDayRoutineIssues] = useState<
+    Record<string, BadComboType>
+  >({});
+  const [nightRoutineIssues, setNightRoutineIssues] = useState<
+    Record<string, BadComboType>
+  >({});
+  const [daySuggestions, setDaySuggestions] = useState<SuggestionType[]>([]);
+  const [nightSuggestions, setNightSuggestions] = useState<SuggestionType[]>(
     [],
   );
   const { user, token } = useAuth();
@@ -48,8 +60,20 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
             setNightProductIds(new Set(nightIds));
 
             await Promise.all([
-              analyzeRoutine(dayProds, true, setDayProductInfo),
-              analyzeRoutine(nightProds, false, setNightProductInfo),
+              analyzeRoutine(
+                dayProds,
+                true,
+                setDayProductInfo,
+                setDayRoutineIssues,
+                setDaySuggestions,
+              ),
+              analyzeRoutine(
+                nightProds,
+                false,
+                setNightProductInfo,
+                setNightRoutineIssues,
+                setNightSuggestions,
+              ),
             ]);
           }
         } catch (error: any) {
@@ -107,8 +131,12 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
     products: RoutineProductType[],
     day: boolean,
     setInfo: React.Dispatch<SetStateAction<RoutineInfoType[]>>,
+    setIssues: React.Dispatch<SetStateAction<Record<string, BadComboType>>>,
+    setSuggestions: React.Dispatch<SetStateAction<SuggestionType[]>>,
   ) => {
     const infos: RoutineInfoType[] = [];
+    const issues: { [identifier: string]: BadComboType } = {};
+
     await Promise.all(
       products.map(async (product: RoutineProductType) => {
         try {
@@ -125,14 +153,32 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
             },
           );
 
+          console.log(response);
+
           if (response.status === 200) {
             const analysis = response.data.analysis;
+            const routineIssues = response.data.routineIssues;
+            const suggestions = response.data.suggestions;
             if (analysis.comedogenic_ingredients.length > 0) {
               infos.push({
                 id: product.id,
                 name: product.name,
                 comedogenic_ingredients: analysis.comedogenic_ingredients,
               });
+            }
+
+            if (routineIssues?.bad_combinations.length > 0) {
+              for (const combo of routineIssues.bad_combinations) {
+                if (!issues[combo.identifier]) {
+                  issues[combo.identifier] = {
+                    combination: combo,
+                  };
+                }
+              }
+            }
+
+            if (suggestions.length > 0) {
+              setSuggestions(suggestions);
             }
           }
         } catch (error: any) {
@@ -142,6 +188,7 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
     );
 
     setInfo(infos);
+    setIssues(issues);
   };
 
   return (
@@ -159,6 +206,14 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
         setDayProductInfo,
         nightProductInfo,
         setNightProductInfo,
+        dayRoutineIssues,
+        nightRoutineIssues,
+        setDayRoutineIssues,
+        setNightRoutineIssues,
+        daySuggestions,
+        nightSuggestions,
+        setDaySuggestions,
+        setNightSuggestions,
       }}
     >
       {children}

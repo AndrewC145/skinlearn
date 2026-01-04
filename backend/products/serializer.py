@@ -37,27 +37,29 @@ def validate_ingredients(value):
 
 
 def validate_category(value):
-    if value not in Products.category:
+    valid_categories = [choice[0] for choice in Products.PRODUCT_CHOICES]
+    if value not in valid_categories:
         raise serializers.ValidationError("Product is not part of a valid category")
     return value
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    ingredients = serializers.ListField(
-        child=serializers.CharField(), allow_empty=False
-    )
+    ingredients = serializers.ListField(child=serializers.CharField(), write_only=True)
 
     class Meta:
         model = Products
         fields = [
+            "id",
             "name",
             "brand",
             "category",
             "ingredients",
+            "raw_ingredients",
             "user_added",
             "created_by",
             "created_at",
             "image",
+            "custom_made",
         ]
         extra_kwargs = {
             "user_added": {"read_only": True},
@@ -72,9 +74,6 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def validate_ingredients(self, value):
         return validate_ingredients(value)
-
-    def validate_category(self, value):
-        return validate_category(value)
 
     def create(self, validated_data):
         ingredient_names = validated_data.pop("ingredients")
@@ -178,8 +177,11 @@ class ProductSubmissionSerializer(serializers.ModelSerializer):
 
 class RoutineProductSerializer(serializers.Serializer):
     id = serializers.IntegerField()
-    name = serializers.CharField(required=False)
-    image = serializers.CharField(required=False)
+
+    def validate_id(self, value):
+        if not Products.objects.filter(id=value).exists():
+            raise serializers.ValidationError("Invalid product ID")
+        return value
 
 
 class RoutineSerializer(serializers.Serializer):

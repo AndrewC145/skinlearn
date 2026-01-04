@@ -39,7 +39,21 @@ export const productSchema = z.object({
   ingredients: z.string().nonempty({ error: "Ingredients cannot be empty" }),
 });
 
+export const customProductSchema = z.object({
+  name: z.string().nonempty({ error: "Product Name cannot be empty" }),
+  brand: z.string().nonempty({ error: "Brand cannot be empty" }),
+  ingredients: z.string().nonempty({ error: "Ingredients cannot be empty" }),
+  category: z.enum(
+    ["Cleanser", "Moisturizer", "Toner", "Sunscreen", "Serum", "Other"],
+    {
+      error: "Please select a category",
+    },
+  ),
+  day: z.boolean(),
+});
+
 export type ingredientsValues = z.infer<typeof ingredientsSchema>;
 export type loginFormValues = z.infer<typeof loginSchema>;
 export type registerFormValues = z.infer<typeof registerSchema>;
 export type productFormValues = z.infer<typeof productSchema>;
+export type customProductFormValues = z.infer<typeof customProductSchema>;
