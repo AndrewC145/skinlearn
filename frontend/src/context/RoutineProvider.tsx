@@ -31,6 +31,8 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
   const [nightRoutineIssues, setNightRoutineIssues] = useState<
     Record<string, BadComboType>
   >({});
+  const [daySuggestions, setDaySuggestions] = useState<string[]>([]);
+  const [nightSuggestions, setNightSuggestions] = useState<string[]>([]);
   const { user, token } = useAuth();
   const { personalIngredients } = usePersonalIngredients();
 
@@ -60,12 +62,14 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
                 true,
                 setDayProductInfo,
                 setDayRoutineIssues,
+                setDaySuggestions,
               ),
               analyzeRoutine(
                 nightProds,
                 false,
                 setNightProductInfo,
                 setNightRoutineIssues,
+                setNightSuggestions,
               ),
             ]);
           }
@@ -125,6 +129,7 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
     day: boolean,
     setInfo: React.Dispatch<SetStateAction<RoutineInfoType[]>>,
     setIssues: React.Dispatch<SetStateAction<Record<string, BadComboType>>>,
+    setSuggestions: React.Dispatch<SetStateAction<string[]>>,
   ) => {
     const infos: RoutineInfoType[] = [];
     const issues: { [identifier: string]: BadComboType } = {};
@@ -148,6 +153,7 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
           if (response.status === 200) {
             const analysis = response.data.analysis;
             const routineIssues = response.data.routineIssues;
+            const suggestions = response.data.suggestions;
             if (analysis.comedogenic_ingredients.length > 0) {
               infos.push({
                 id: product.id,
@@ -164,6 +170,10 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
                   };
                 }
               }
+            }
+
+            if (suggestions.length > 0) {
+              setSuggestions(suggestions);
             }
           }
         } catch (error: any) {
@@ -195,6 +205,10 @@ function RoutineProvider({ children }: { children: React.ReactNode }) {
         nightRoutineIssues,
         setDayRoutineIssues,
         setNightRoutineIssues,
+        daySuggestions,
+        nightSuggestions,
+        setDaySuggestions,
+        setNightSuggestions,
       }}
     >
       {children}

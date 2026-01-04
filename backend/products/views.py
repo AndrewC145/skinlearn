@@ -268,8 +268,20 @@ def save_and_analyze_product(request):
         else []
     )
 
+    ingredient_categories = get_ingredient_categories(all_products)
+    product_categories = get_product_categories(all_products)
+    current_routine = "day" if day_routine else "night"
+
+    suggestions = generate_suggestions(
+        product_categories, ingredient_categories, current_routine
+    )
+
     return Response(
-        {"analysis": analysis, "routineIssues": routine_issues},
+        {
+            "analysis": analysis,
+            "routineIssues": routine_issues,
+            "suggestions": suggestions,
+        },
         status=status.HTTP_200_OK,
     )
 
@@ -344,3 +356,74 @@ def check_compatibility_products(products, bad_combos):
                 product_names.add(product_name)
 
     return list(product_names)
+
+
+SUGGESTIVE_RULES = [
+    {
+        "id": 1,
+        "type": "ingredient",
+        "category": "retinol",
+        "current_time": "day",
+        "suggested_time": "night",
+        "message": "Retinoids are best used at night to reduce sun sensitivity.",
+    },
+    {
+        "id": 2,
+        "type": "ingredient",
+        "category": "vitamin c",
+        "current_time": "night",
+        "suggested_time": "day",
+        "message": "Vitamin C is most effective in the morning.",
+    },
+    {
+        "id": 3,
+        "type": "ingredient",
+        "category": "AHA",
+        "current_time": "day",
+        "suggested_time": "night",
+        "message": "AHA exfoliants are usually recommended for nighttime use.",
+    },
+    {
+        "id": 4,
+        "type": "product",
+        "category": "Sunscreen",
+        "current_time": "night",
+        "suggested_time": "day",
+        "message": "Sunscreen is typically used during the daytime.",
+    },
+]
+
+
+def get_ingredient_categories(products):
+    return set(
+        Ingredients.objects.filter(products__in=products).values_list(
+            "category", flat=True
+        )
+    )
+
+
+def get_product_categories(products):
+    categories = set()
+    for product in products:
+        categories.add(product.category)
+    return categories
+
+
+def generate_suggestions(product_categories, ingredient_categories, current_routine):
+    suggestions = []
+    seen = set()
+    for rule in SUGGESTIVE_RULES:
+        if rule["current_time"] != current_routine:
+            continue
+        if rule["id"] in seen:
+            continue
+
+        if rule["type"] == "ingredient" and rule["category"] in ingredient_categories:
+            suggestions.append(rule["message"])
+            seen.add(rule["id"])
+
+        elif rule["type"] == "product" and rule["category"] in product_categories:
+            suggestions.append(rule["message"])
+            seen.add(rule["id"])
+
+    return suggestions

@@ -34,6 +34,7 @@ function SearchModal({
   setRoutineProducts,
   setProductInfo,
   setRoutineIssues,
+  setSuggestions,
 }: {
   day: boolean;
   setRoutineProducts: React.Dispatch<SetStateAction<Set<RoutineProductType>>>;
@@ -41,6 +42,7 @@ function SearchModal({
   setRoutineIssues: React.Dispatch<
     SetStateAction<Record<string, BadComboType>>
   >;
+  setSuggestions?: React.Dispatch<SetStateAction<string[]>>;
 }) {
   const [products, setProducts] = useState<ProductType[]>([]);
   const [searchText, setSearchText] = useState<string>("");
@@ -145,6 +147,16 @@ function SearchModal({
             });
           }
         }
+        const suggestions = response.data.suggestions;
+        for (const suggestion of suggestions) {
+          setSuggestions?.((prev) => {
+            if (!prev.includes(suggestion)) {
+              return [...prev, suggestion];
+            }
+            return prev;
+          });
+        }
+
         if (day) {
           setDayProductIds((prev) => new Set([...prev, p.id]));
         } else {

@@ -26,6 +26,10 @@ type RoutineContextType = {
   setNightRoutineIssues: React.Dispatch<
     SetStateAction<Record<string, BadComboType>>
   >;
+  daySuggestions?: string[];
+  nightSuggestions?: string[];
+  setDaySuggestions?: React.Dispatch<SetStateAction<string[]>>;
+  setNightSuggestions?: React.Dispatch<SetStateAction<string[]>>;
 };
 
 export const RoutineContext = createContext<RoutineContextType>({
@@ -47,6 +51,10 @@ export const RoutineContext = createContext<RoutineContextType>({
   nightRoutineIssues: {},
   setDayRoutineIssues: () => {},
   setNightRoutineIssues: () => {},
+  daySuggestions: undefined,
+  nightSuggestions: undefined,
+  setDaySuggestions: () => {},
+  setNightSuggestions: () => {},
 });
 
 export const useRoutine = () => {

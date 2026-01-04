@@ -17,6 +17,10 @@ function Builder() {
     nightRoutineIssues,
     setDayRoutineIssues,
     setNightRoutineIssues,
+    setDaySuggestions,
+    setNightSuggestions,
+    daySuggestions,
+    nightSuggestions,
   } = useRoutine();
 
   return (
@@ -33,6 +37,8 @@ function Builder() {
             routineIssues={dayRoutineIssues}
             setRoutineIssues={setDayRoutineIssues}
             icon={<Sun />}
+            suggestions={daySuggestions}
+            setSuggestions={setDaySuggestions}
           />
           <Routine
             day={false}
@@ -43,6 +49,8 @@ function Builder() {
             routineIssues={nightRoutineIssues}
             setRoutineIssues={setNightRoutineIssues}
             icon={<Moon />}
+            suggestions={nightSuggestions}
+            setSuggestions={setNightSuggestions}
           />
         </div>
       </div>

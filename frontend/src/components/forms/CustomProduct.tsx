@@ -81,7 +81,6 @@ function CustomProduct({
           },
         );
 
-        console.log(response);
         if (response.status === 201) {
           setSuccess("Custom product added successfully!");
           setCustomErr(null);
